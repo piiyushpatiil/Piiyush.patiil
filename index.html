@@ -1,101 +1,117 @@
 <!DOCTYPE html>
 <html lang="mr">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My AR Website</title>
+    <title>AR Hand Tracking Video Maker</title>
+    
+    <!-- AI Hand Tracking Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    
     <style>
         body { 
             margin: 0; 
             overflow: hidden; 
             background-color: black; 
-            color: white; 
-            font-family: monospace;
+            color: #00ffcc; 
+            font-family: monospace; 
         }
-        #webcam { 
+        /* व्हिडिओ लपवणे आणि कॅनव्हासवर दाखवणे जेणेकरून इफेक्ट लावता येईल */
+        video { display: none; } 
+        canvas { 
             position: absolute; 
             top: 0; 
             left: 0; 
             width: 100vw; 
             height: 100vh; 
             object-fit: cover; 
-            z-index: -1; 
+            transform: scaleX(-1); /* आरशासारखा इफेक्ट */
         }
-        #coordinates { 
+        #ui { 
             position: absolute; 
             top: 20px; 
             left: 20px; 
-            font-size: 20px; 
-            color: #00ffcc; 
-            text-shadow: 2px 2px 4px #000000;
-            z-index: 2;
-        }
-        canvas { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            z-index: 1; 
-            pointer-events: none;
+            z-index: 10; 
+            font-size: 18px; 
+            text-shadow: 2px 2px 4px #000000; 
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-    <video id="webcam" autoplay playsinline></video>
-    
-    <div id="coordinates">
-        Scanning Target...<br>
-        x: <span id="posX">0</span> y: <span id="posY">0</span>
+    <div id="ui">
+        Scanning Hand...<br>
+        <span id="status">Waiting for camera...</span>
     </div>
+    
+    <video id="input_video" autoplay playsinline></video>
+    <canvas id="output_canvas"></canvas>
 
     <script>
-        // कॅमेरा चालू करण्यासाठी
-        const video = document.getElementById('webcam');
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            navigator.mediaDevices.getUserMedia({ video: true })
-            .then(function(stream) {
-                video.srcObject = stream;
-            })
-            .catch(function(error) {
-                console.error("Camera Error", error);
-                alert("Please allow camera access.");
-            });
+        const videoElement = document.getElementById('input_video');
+        const canvasElement = document.getElementById('output_canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const statusText = document.getElementById('status');
+
+        // स्क्रीनच्या आकारानुसार कॅनव्हास सेट करणे
+        function resizeCanvas() {
+            canvasElement.width = window.innerWidth;
+            canvasElement.height = window.innerHeight;
         }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-        // 3D बॉक्स (Cube) बनवण्यासाठी
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true }); 
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        const geometry = new THREE.BoxGeometry(2, 2, 2);
-        const material = new THREE.MeshBasicMaterial({ color: 0xff00ff, wireframe: true }); 
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
-        
-        camera.position.z = 5;
-
-        // अ‍ॅनिमेशन लूप
-        function animate() {
-            requestAnimationFrame(animate);
+        // हात ओळखल्यावर काय करायचे त्याचे कोडिंग
+        function onResults(results) {
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
             
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
+            // कॅमेराचा व्हिडिओ बॅकग्राउंडला दाखवणे
+            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
-            document.getElementById('posX').innerText = Math.floor(Math.random() * 200 + 400);
-            document.getElementById('posY').innerText = Math.floor(Math.random() * 200 + 200);
-
-            renderer.render(scene, camera);
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                for (const landmarks of results.multiHandLandmarks) {
+                    // हातावर गुलाबी रंगाची वायरफ्रेम (आकृती) काढणे
+                    drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {color: '#ff00ff', lineWidth: 3});
+                    // सांध्यांवर (Joints) निळ्या रंगाचे ठिपके काढणे
+                    drawLandmarks(canvasCtx, landmarks, {color: '#00ffcc', lineWidth: 1, radius: 4});
+                    
+                    // हाताच्या मध्यभागाचे X आणि Y नंबर्स दाखवणे
+                    const x = Math.round(landmarks[9].x * 1000);
+                    const y = Math.round(landmarks[9].y * 1000);
+                    statusText.innerText = `x: ${x} y: ${y} \nTracking Active!`;
+                }
+            } else {
+                statusText.innerText = "Bring your hand in front of camera";
+            }
+            canvasCtx.restore();
         }
-        animate();
 
-        window.addEventListener('resize', () => {
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
+        // AI मॉडेल सेट करणे
+        const hands = new Hands({locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+        }});
+        
+        hands.setOptions({
+            maxNumHands: 2, // एकाच वेळी २ हात ओळखेल
+            modelComplexity: 1,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
         });
+        hands.onResults(onResults);
+
+        // कॅमेरा चालू करणे
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                await hands.send({image: videoElement});
+            },
+            width: 1280,
+            height: 720
+        });
+        camera.start();
     </script>
 </body>
 </html>
