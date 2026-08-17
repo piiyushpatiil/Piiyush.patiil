@@ -1,158 +1,1196 @@
 <!DOCTYPE html>
-<html lang="mr">
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced AR Hologram Projection</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
-    
-    <style>
-        body { margin: 0; overflow: hidden; background-color: black; font-family: monospace; }
-        video { display: none; }
-        
-        canvas { 
-            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; 
-            transform: scaleX(-1); /* आरशासारखा इफेक्ट */
-            transition: filter 0.1s;
-        }
-        
-        /* हॅकर ग्लिच इफेक्ट */
-        .glitch-active {
-            filter: invert(1) hue-rotate(270deg) contrast(2) saturate(3);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 
-        #startBtn {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            padding: 15px 30px; font-size: 20px; background: #ff00ff; color: white;
-            border: 2px solid #00ffcc; border-radius: 10px; z-index: 20; box-shadow: 0 0 20px #ff00ff;
-            font-weight: bold; cursor: pointer; text-transform: uppercase;
-        }
-    </style>
+<title>AR Hologram Lab</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    overflow:hidden;
+    background:#000;
+    font-family:monospace;
+    color:#00ffcc;
+}
+
+#video{
+    display:none;
+}
+
+#cameraCanvas{
+    position:fixed;
+    inset:0;
+    width:100vw;
+    height:100vh;
+    object-fit:cover;
+    transform:scaleX(-1);
+}
+
+#three{
+    position:fixed;
+    inset:0;
+    width:100vw;
+    height:100vh;
+    pointer-events:none;
+}
+
+#hud{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+}
+
+#info{
+    position:absolute;
+    top:12px;
+    left:12px;
+    line-height:1.7;
+    font-size:12px;
+    text-shadow:0 0 10px #00ffcc;
+}
+
+.title{
+    font-size:20px;
+    color:#ff00ff;
+    font-weight:bold;
+}
+
+#target{
+    position:absolute;
+    width:42px;
+    height:42px;
+    border:1px solid #00ffcc;
+    border-radius:50%;
+    transform:translate(-50%,-50%);
+    box-shadow:0 0 15px #00ffcc;
+}
+
+#message{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    color:white;
+    text-shadow:0 0 15px #00ffcc;
+    text-align:center;
+}
+
+button{
+    position:fixed;
+    z-index:20;
+    font-family:monospace;
+    font-weight:bold;
+    background:#050505;
+    color:#00ffcc;
+    border:1px solid #00ffcc;
+    border-radius:9px;
+    box-shadow:0 0 12px #00ffcc;
+}
+
+#start{
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    padding:16px 28px;
+    font-size:18px;
+}
+
+#open{
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    padding:12px 25px;
+}
+
+#objects{
+    position:fixed;
+    right:12px;
+    top:12px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.objectBtn{
+    position:static;
+    padding:9px 12px;
+    font-size:11px;
+}
+
+#help{
+    position:fixed;
+    bottom:65px;
+    left:50%;
+    transform:translateX(-50%);
+    width:90%;
+    text-align:center;
+    font-size:11px;
+    color:#aaa;
+}
+</style>
 </head>
+
 <body>
 
-    <button id="startBtn">Start Hologram</button>
-    
-    <video id="input_video" autoplay playsinline></video>
-    <canvas id="output_canvas"></canvas>
+<video id="video" autoplay playsinline></video>
 
-    <script>
-        const videoElement = document.getElementById('input_video');
-        const canvasElement = document.getElementById('output_canvas');
-        const canvasCtx = canvasElement.getContext('2d');
-        const startBtn = document.getElementById('startBtn');
+<canvas id="cameraCanvas"></canvas>
 
-        function resizeCanvas() {
-            canvasElement.width = window.innerWidth;
-            canvasElement.height = window.innerHeight;
+<div id="three"></div>
+
+<div id="hud">
+
+    <div id="info">
+        <div class="title">AR HOLOGRAM LAB</div>
+        SYSTEM: <span id="system">OFFLINE</span><br>
+        CAMERA: <span id="cameraStatus">OFF</span><br>
+        HANDS: <span id="hands">0</span><br>
+        OBJECT: <span id="objectName">NONE</span><br>
+        MODE: <span id="mode">IDLE</span>
+    </div>
+
+    <div id="target"></div>
+
+    <div id="message">
+        WAITING FOR HAND
+    </div>
+
+</div>
+
+<div id="objects">
+
+    <button class="objectBtn" onclick="selectObject('phone')">
+        📱 MOBILE
+    </button>
+
+    <button class="objectBtn" onclick="selectObject('charger')">
+        🔌 CHARGER
+    </button>
+
+    <button class="objectBtn" onclick="selectObject('keypad')">
+        ⌨️ KEYPAD
+    </button>
+
+</div>
+
+<button id="start">
+START HOLOGRAM
+</button>
+
+<button id="open">
+OPEN OBJECT
+</button>
+
+<div id="help">
+☝ Move • 🤏 Pinch = Grab/Scale • OPEN = Internal Parts
+</div>
+
+
+<script>
+
+/* =====================================================
+   CAMERA
+===================================================== */
+
+const video =
+document.getElementById("video");
+
+const cameraCanvas =
+document.getElementById("cameraCanvas");
+
+const ctx =
+cameraCanvas.getContext("2d");
+
+function resizeCamera(){
+
+    cameraCanvas.width =
+    innerWidth;
+
+    cameraCanvas.height =
+    innerHeight;
+}
+
+resizeCamera();
+
+addEventListener(
+    "resize",
+    resizeCamera
+);
+
+
+/* =====================================================
+   THREE.JS
+===================================================== */
+
+const container =
+document.getElementById("three");
+
+const scene =
+new THREE.Scene();
+
+const camera =
+new THREE.PerspectiveCamera(
+    60,
+    innerWidth/innerHeight,
+    .1,
+    100
+);
+
+camera.position.z = 7;
+
+const renderer =
+new THREE.WebGLRenderer({
+    alpha:true,
+    antialias:true
+});
+
+renderer.setPixelRatio(
+    Math.min(devicePixelRatio,2)
+);
+
+renderer.setSize(
+    innerWidth,
+    innerHeight
+);
+
+container.appendChild(
+    renderer.domElement
+);
+
+
+/* =====================================================
+   OBJECT GROUP
+===================================================== */
+
+const hologram =
+new THREE.Group();
+
+scene.add(hologram);
+
+
+/* =====================================================
+   MATERIALS
+===================================================== */
+
+const outerMaterial =
+new THREE.MeshBasicMaterial({
+
+    color:0x00ffcc,
+
+    wireframe:true,
+
+    transparent:true,
+
+    opacity:.9
+
+});
+
+const innerMaterial =
+new THREE.MeshBasicMaterial({
+
+    color:0xff00ff,
+
+    wireframe:true,
+
+    transparent:true,
+
+    opacity:.75
+
+});
+
+const solidMaterial =
+new THREE.MeshBasicMaterial({
+
+    color:0x00ffcc,
+
+    transparent:true,
+
+    opacity:.18
+
+});
+
+
+/* =====================================================
+   CURRENT OBJECT
+===================================================== */
+
+let currentObject =
+"phone";
+
+let isOpen =
+false;
+
+let grabbed =
+false;
+
+let animation =
+false;
+
+
+/* =====================================================
+   CLEAR OBJECT
+===================================================== */
+
+function clearHologram(){
+
+    while(hologram.children.length){
+
+        hologram.remove(
+            hologram.children[0]
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+function createPhone(){
+
+    clearHologram();
+
+    const phone =
+    new THREE.Group();
+
+    const body =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            2.3,
+            4.2,
+            .25
+        ),
+
+        outerMaterial
+
+    );
+
+    phone.add(body);
+
+
+    /* Screen */
+
+    const screen =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            2.05,
+            3.65,
+            .04
+        ),
+
+        solidMaterial
+
+    );
+
+    screen.position.z =
+    .15;
+
+    phone.add(screen);
+
+
+    /* Camera */
+
+    const cam =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            .4,
+            .4,
+            .08
+        ),
+
+        innerMaterial
+
+    );
+
+    cam.position.set(
+        -.7,
+        1.5,
+        .2
+    );
+
+    phone.add(cam);
+
+
+    /* Internal battery */
+
+    const battery =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            1.4,
+            2.1,
+            .12
+        ),
+
+        innerMaterial
+
+    );
+
+    battery.position.z =
+    -.2;
+
+    battery.visible =
+    false;
+
+    battery.name =
+    "BATTERY";
+
+    phone.add(battery);
+
+
+    /* PCB */
+
+    const pcb =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            1.5,
+            .7,
+            .1
+        ),
+
+        innerMaterial
+
+    );
+
+    pcb.position.set(
+        0,
+        -1.45,
+        -.2
+    );
+
+    pcb.visible =
+    false;
+
+    pcb.name =
+    "PCB";
+
+    phone.add(pcb);
+
+
+    /* Speaker */
+
+    const speaker =
+    new THREE.Mesh(
+
+        new THREE.CylinderGeometry(
+            .35,
+            .35,
+            .08,
+            24
+        ),
+
+        innerMaterial
+
+    );
+
+    speaker.rotation.x =
+    Math.PI/2;
+
+    speaker.position.set(
+        .65,
+        -1.55,
+        -.2
+    );
+
+    speaker.visible =
+    false;
+
+    speaker.name =
+    "SPEAKER";
+
+    phone.add(speaker);
+
+
+    hologram.add(phone);
+
+    return phone;
+}
+
+
+/* =====================================================
+   CHARGER
+===================================================== */
+
+function createCharger(){
+
+    clearHologram();
+
+    const charger =
+    new THREE.Group();
+
+
+    const body =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            2.5,
+            2.2,
+            1.5
+        ),
+
+        outerMaterial
+
+    );
+
+    charger.add(body);
+
+
+    /* Internal PCB */
+
+    const pcb =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            1.5,
+            .9,
+            .12
+        ),
+
+        innerMaterial
+
+    );
+
+    pcb.position.z =
+    .05;
+
+    pcb.visible =
+    false;
+
+    pcb.name =
+    "CHARGER PCB";
+
+    charger.add(pcb);
+
+
+    /* Transformer */
+
+    const transformer =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            .8,
+            .7,
+            .5
+        ),
+
+        innerMaterial
+
+    );
+
+    transformer.position.set(
+        -.45,
+        -.25,
+        .1
+    );
+
+    transformer.visible =
+    false;
+
+    transformer.name =
+    "TRANSFORMER";
+
+    charger.add(transformer);
+
+
+    /* Capacitor */
+
+    const capacitor =
+    new THREE.Mesh(
+
+        new THREE.CylinderGeometry(
+            .2,
+            .2,
+            .7,
+            16
+        ),
+
+        innerMaterial
+
+    );
+
+    capacitor.position.set(
+        .55,
+        .2,
+        .1
+    );
+
+    capacitor.visible =
+    false;
+
+    capacitor.name =
+    "CAPACITOR";
+
+    charger.add(capacitor);
+
+
+    hologram.add(charger);
+
+    return charger;
+}
+
+
+/* =====================================================
+   KEYPAD
+===================================================== */
+
+function createKeypad(){
+
+    clearHologram();
+
+    const keypad =
+    new THREE.Group();
+
+
+    /* Outer board */
+
+    const board =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            3.2,
+            2.5,
+            .25
+        ),
+
+        outerMaterial
+
+    );
+
+    keypad.add(board);
+
+
+    /* PCB */
+
+    const pcb =
+    new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+            2.5,
+            1.8,
+            .1
+        ),
+
+        innerMaterial
+
+    );
+
+    pcb.position.z =
+    -.25;
+
+    pcb.visible =
+    false;
+
+    pcb.name =
+    "KEYPAD PCB";
+
+    keypad.add(pcb);
+
+
+    /* Buttons */
+
+    for(let x=-1;x<=1;x++){
+
+        for(let y=-1;y<=1;y++){
+
+            const key =
+            new THREE.Mesh(
+
+                new THREE.BoxGeometry(
+                    .55,
+                    .55,
+                    .18
+                ),
+
+                solidMaterial
+
+            );
+
+            key.position.set(
+                x*.75,
+                y*.65,
+                .25
+            );
+
+            keypad.add(key);
+
         }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
 
-        // मधूनच येणारा ग्लिच इफेक्ट
-        setInterval(() => {
-            if(Math.random() > 0.8) { 
-                canvasElement.classList.add('glitch-active');
-                setTimeout(() => canvasElement.classList.remove('glitch-active'), 100); 
-            }
-        }, 1500);
+    }
 
-        function onResults(results) {
-            canvasCtx.save();
-            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
-            const w = canvasElement.width;
-            const h = canvasElement.height;
+    hologram.add(keypad);
 
-            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                
-                // १. हातांवर स्कॅनिंग आणि नंबर्स दाखवणे
-                for (const landmarks of results.multiHandLandmarks) {
-                    // तुटक-तुटक (Dashed) रेषा काढणे
-                    canvasCtx.setLineDash([5, 5]);
-                    drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {color: '#ffffff', lineWidth: 1});
-                    canvasCtx.setLineDash([]); // रेषा नॉर्मल करणे
-                    
-                    drawLandmarks(canvasCtx, landmarks, {color: '#00ffcc', lineWidth: 1, radius: 3});
-                    
-                    // हवेत तरंगणारे X आणि Y नंबर्स
-                    canvasCtx.fillStyle = '#00ffcc';
-                    canvasCtx.font = '16px monospace';
-                    canvasCtx.shadowColor = "black";
-                    canvasCtx.shadowBlur = 4;
-                    canvasCtx.fillText(`x:${Math.round(landmarks[8].x*1000)} y:${Math.round(landmarks[8].y*1000)}`, landmarks[8].x * w + 10, landmarks[8].y * h);
-                }
+    return keypad;
+}
 
-                // २. *** खरी जादू: दोन्ही हातांमध्ये डायग्राम बनवणे ***
-                // जर कॅमेऱ्यात २ हात दिसले तर त्यांच्यामध्ये आकृती तयार होईल
-                if (results.multiHandLandmarks.length === 2) {
-                    const hand1 = results.multiHandLandmarks[0];
-                    const hand2 = results.multiHandLandmarks[1];
 
-                    // अंगठे आणि तर्जनी (Index Fingers) चे पॉईंट्स जोडणे
-                    canvasCtx.beginPath();
-                    canvasCtx.moveTo(hand1[8].x * w, hand1[8].y * h); // पहिल्या हाताचे बोट
-                    canvasCtx.lineTo(hand2[8].x * w, hand2[8].y * h); // दुसऱ्या हाताचे बोट
-                    canvasCtx.lineTo(hand2[4].x * w, hand2[4].y * h); // दुसऱ्या हाताचा अंगठा
-                    canvasCtx.lineTo(hand1[4].x * w, hand1[4].y * h); // पहिल्या हाताचा अंगठा
-                    canvasCtx.closePath();
+/* =====================================================
+   SELECT OBJECT
+===================================================== */
 
-                    // आकृतीमध्ये कलर भरणे (होलोग्राम इफेक्ट)
-                    canvasCtx.fillStyle = 'rgba(0, 255, 204, 0.4)'; // पारदर्शक निळा रंग
-                    canvasCtx.fill();
-                    
-                    // आकृतीला गुलाबी रंगाची बॉर्डर देणे
-                    canvasCtx.strokeStyle = '#ff00ff';
-                    canvasCtx.lineWidth = 3;
-                    canvasCtx.stroke();
-                    
-                    // आकृतीच्या मधे 'Target Locked' असे लिहिणे
-                    canvasCtx.fillStyle = '#ffffff';
-                    canvasCtx.font = 'bold 24px monospace';
-                    const midX = ((hand1[8].x + hand2[8].x) / 2) * w - 50;
-                    const midY = ((hand1[8].y + hand2[8].y) / 2) * h;
-                    canvasCtx.fillText("TARGET LOCKED", midX, midY);
-                }
-            }
-            canvasCtx.restore();
+function selectObject(name){
+
+    currentObject =
+    name;
+
+    isOpen =
+    false;
+
+    if(name === "phone")
+        createPhone();
+
+    if(name === "charger")
+        createCharger();
+
+    if(name === "keypad")
+        createKeypad();
+
+
+    document.getElementById(
+        "objectName"
+    ).textContent =
+    name.toUpperCase();
+
+    document.getElementById(
+        "message"
+    ).textContent =
+    name.toUpperCase()+" SELECTED";
+
+}
+
+
+/* =====================================================
+   OPEN / CLOSE
+===================================================== */
+
+document
+.getElementById("open")
+.addEventListener(
+"click",
+()=>{
+
+    isOpen =
+    !isOpen;
+
+    const children =
+    hologram.children[0]
+    ?.children || [];
+
+
+    for(const child of children){
+
+        if(
+            child.name &&
+            (
+                child.name.includes("BATTERY") ||
+                child.name.includes("PCB") ||
+                child.name.includes("SPEAKER") ||
+                child.name.includes("TRANSFORMER") ||
+                child.name.includes("CAPACITOR")
+            )
+        ){
+
+            child.visible =
+            isOpen;
+
         }
 
-        const hands = new Hands({locateFile: (file) => {
-            return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
-        }});
-        
-        hands.setOptions({
-            maxNumHands: 2, // २ हात ओळखण्यासाठी सेट केले आहे
-            modelComplexity: 1,
-            minDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5
-        });
-        hands.onResults(onResults);
+    }
 
-        startBtn.addEventListener('click', () => {
-            startBtn.style.display = 'none';
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
-                .then((stream) => {
-                    videoElement.srcObject = stream;
-                    videoElement.play();
-                    
-                    const tick = async () => {
-                        if (videoElement.readyState >= 2) {
-                            await hands.send({image: videoElement});
-                        }
-                        requestAnimationFrame(tick);
-                    }
-                    tick();
-                })
-                .catch((err) => alert("कॅमेरा चालू होऊ शकला नाही."));
-            }
+
+    if(isOpen){
+
+        document.getElementById(
+            "open"
+        ).textContent =
+        "CLOSE OBJECT";
+
+        document.getElementById(
+            "mode"
+        ).textContent =
+        "INTERNAL VIEW";
+
+        document.getElementById(
+            "message"
+        ).textContent =
+        "INTERNAL COMPONENTS";
+
+    }else{
+
+        document.getElementById(
+            "open"
+        ).textContent =
+        "OPEN OBJECT";
+
+        document.getElementById(
+            "mode"
+        ).textContent =
+        "HOLOGRAM";
+
+    }
+
+});
+
+
+/* =====================================================
+   MEDIAPIPE HANDS
+===================================================== */
+
+const hands =
+new Hands({
+
+    locateFile:
+    file =>
+    `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+
+});
+
+hands.setOptions({
+
+    maxNumHands:2,
+
+    modelComplexity:1,
+
+    minDetectionConfidence:.6,
+
+    minTrackingConfidence:.6
+
+});
+
+
+hands.onResults(
+results=>{
+
+    ctx.save();
+
+    ctx.clearRect(
+        0,
+        0,
+        cameraCanvas.width,
+        cameraCanvas.height
+    );
+
+    ctx.drawImage(
+        results.image,
+        0,
+        0,
+        cameraCanvas.width,
+        cameraCanvas.height
+    );
+
+    ctx.restore();
+
+
+    const list =
+    results.multiHandLandmarks || [];
+
+
+    document.getElementById(
+        "hands"
+    ).textContent =
+    list.length;
+
+
+    if(!list.length){
+
+        grabbed =
+        false;
+
+        document.getElementById(
+            "message"
+        ).textContent =
+        "WAITING FOR HAND";
+
+        return;
+    }
+
+
+    const hand =
+    list[0];
+
+    const index =
+    hand[8];
+
+    const thumb =
+    hand[4];
+
+
+    /* Finger target */
+
+    const target =
+    document.getElementById(
+        "target"
+    );
+
+    target.style.left =
+    ((1-index.x)*100)+"%";
+
+    target.style.top =
+    (index.y*100)+"%";
+
+
+    /* Pinch */
+
+    const dx =
+    index.x-thumb.x;
+
+    const dy =
+    index.y-thumb.y;
+
+    const distance =
+    Math.sqrt(
+        dx*dx+dy*dy
+    );
+
+
+    const pinch =
+    distance < .075;
+
+
+    /* World position */
+
+    const worldX =
+    (index.x-.5)*7;
+
+    const worldY =
+    -(index.y-.5)*5;
+
+
+    if(pinch){
+
+        grabbed =
+        true;
+
+        hologram.position.x =
+        THREE.MathUtils.lerp(
+            hologram.position.x,
+            worldX,
+            .25
+        );
+
+        hologram.position.y =
+        THREE.MathUtils.lerp(
+            hologram.position.y,
+            worldY,
+            .25
+        );
+
+
+        const scale =
+        THREE.MathUtils.clamp(
+            .7 + distance*7,
+            .6,
+            2.2
+        );
+
+        hologram.scale.set(
+            scale,
+            scale,
+            scale
+        );
+
+
+        document.getElementById(
+            "mode"
+        ).textContent =
+        "GRABBING";
+
+        document.getElementById(
+            "message"
+        ).textContent =
+        "OBJECT GRABBED";
+
+    }else{
+
+        grabbed =
+        false;
+
+        document.getElementById(
+            "mode"
+        ).textContent =
+        isOpen ?
+        "INTERNAL VIEW":
+        "TRACKING";
+
+    }
+
+});
+
+
+/* =====================================================
+   START CAMERA
+===================================================== */
+
+document
+.getElementById("start")
+.addEventListener(
+"click",
+async()=>{
+
+    try{
+
+        const stream =
+        await navigator
+        .mediaDevices
+        .getUserMedia({
+
+            video:{
+                facingMode:"user",
+                width:{
+                    ideal:1280
+                },
+                height:{
+                    ideal:720
+                }
+            },
+
+            audio:false
+
         });
-    </script>
+
+
+        video.srcObject =
+        stream;
+
+        await video.play();
+
+
+        document.getElementById(
+            "start"
+        ).style.display =
+        "none";
+
+
+        document.getElementById(
+            "system"
+        ).textContent =
+        "ONLINE";
+
+
+        document.getElementById(
+            "cameraStatus"
+        ).textContent =
+        "ACTIVE";
+
+
+        async function loop(){
+
+            if(
+                video.readyState >= 2
+            ){
+
+                await hands.send({
+                    image:video
+                });
+
+            }
+
+            requestAnimationFrame(
+                loop
+            );
+
+        }
+
+        loop();
+
+
+    }catch(e){
+
+        console.error(e);
+
+        alert(
+            "Camera permission द्या."
+        );
+
+    }
+
+});
+
+
+/* =====================================================
+   ANIMATION
+===================================================== */
+
+function animate(){
+
+    requestAnimationFrame(
+        animate
+    );
+
+
+    hologram.rotation.y +=
+    .006;
+
+    hologram.rotation.x +=
+    .003;
+
+
+    if(isOpen){
+
+        hologram.rotation.y +=
+        .012;
+
+    }
+
+
+    hologram.position.z =
+    Math.sin(
+        Date.now()*.002
+    )*.25;
+
+
+    renderer.render(
+        scene,
+        camera
+    );
+
+}
+
+animate();
+
+
+/* =====================================================
+   INITIAL OBJECT
+===================================================== */
+
+selectObject("phone");
+
+
+/* =====================================================
+   RESIZE THREE
+===================================================== */
+
+addEventListener(
+"resize",
+()=>{
+
+    camera.aspect =
+    innerWidth/innerHeight;
+
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(
+        innerWidth,
+        innerHeight
+    );
+
+});
+
+</script>
+
 </body>
 </html>
