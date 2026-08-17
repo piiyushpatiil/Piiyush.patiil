@@ -3,49 +3,39 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Hand Tracking Video Maker</title>
+    <title>Advanced AR Hologram Projection</title>
     
-    <!-- AI Hand Tracking Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     
     <style>
-        body { 
-            margin: 0; 
-            overflow: hidden; 
-            background-color: black; 
-            color: #00ffcc; 
-            font-family: monospace; 
-        }
-        /* व्हिडिओ लपवणे आणि कॅनव्हासवर दाखवणे जेणेकरून इफेक्ट लावता येईल */
-        video { display: none; } 
+        body { margin: 0; overflow: hidden; background-color: black; font-family: monospace; }
+        video { display: none; }
+        
         canvas { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100vw; 
-            height: 100vh; 
-            object-fit: cover; 
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; 
             transform: scaleX(-1); /* आरशासारखा इफेक्ट */
+            transition: filter 0.1s;
         }
-        #ui { 
-            position: absolute; 
-            top: 20px; 
-            left: 20px; 
-            z-index: 10; 
-            font-size: 18px; 
-            text-shadow: 2px 2px 4px #000000; 
+        
+        /* हॅकर ग्लिच इफेक्ट */
+        .glitch-active {
+            filter: invert(1) hue-rotate(270deg) contrast(2) saturate(3);
+        }
+
+        #startBtn {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            padding: 15px 30px; font-size: 20px; background: #ff00ff; color: white;
+            border: 2px solid #00ffcc; border-radius: 10px; z-index: 20; box-shadow: 0 0 20px #ff00ff;
+            font-weight: bold; cursor: pointer; text-transform: uppercase;
         }
     </style>
 </head>
 <body>
 
-    <div id="ui">
-        Scanning Hand...<br>
-        <span id="status">Waiting for camera...</span>
-    </div>
+    <button id="startBtn">Start Hologram</button>
     
     <video id="input_video" autoplay playsinline></video>
     <canvas id="output_canvas"></canvas>
@@ -54,9 +44,8 @@
         const videoElement = document.getElementById('input_video');
         const canvasElement = document.getElementById('output_canvas');
         const canvasCtx = canvasElement.getContext('2d');
-        const statusText = document.getElementById('status');
+        const startBtn = document.getElementById('startBtn');
 
-        // स्क्रीनच्या आकारानुसार कॅनव्हास सेट करणे
         function resizeCanvas() {
             canvasElement.width = window.innerWidth;
             canvasElement.height = window.innerHeight;
@@ -64,54 +53,106 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // हात ओळखल्यावर काय करायचे त्याचे कोडिंग
+        // मधूनच येणारा ग्लिच इफेक्ट
+        setInterval(() => {
+            if(Math.random() > 0.8) { 
+                canvasElement.classList.add('glitch-active');
+                setTimeout(() => canvasElement.classList.remove('glitch-active'), 100); 
+            }
+        }, 1500);
+
         function onResults(results) {
             canvasCtx.save();
             canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            
-            // कॅमेराचा व्हिडिओ बॅकग्राउंडला दाखवणे
             canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
+            const w = canvasElement.width;
+            const h = canvasElement.height;
+
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                
+                // १. हातांवर स्कॅनिंग आणि नंबर्स दाखवणे
                 for (const landmarks of results.multiHandLandmarks) {
-                    // हातावर गुलाबी रंगाची वायरफ्रेम (आकृती) काढणे
-                    drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {color: '#ff00ff', lineWidth: 3});
-                    // सांध्यांवर (Joints) निळ्या रंगाचे ठिपके काढणे
-                    drawLandmarks(canvasCtx, landmarks, {color: '#00ffcc', lineWidth: 1, radius: 4});
+                    // तुटक-तुटक (Dashed) रेषा काढणे
+                    canvasCtx.setLineDash([5, 5]);
+                    drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {color: '#ffffff', lineWidth: 1});
+                    canvasCtx.setLineDash([]); // रेषा नॉर्मल करणे
                     
-                    // हाताच्या मध्यभागाचे X आणि Y नंबर्स दाखवणे
-                    const x = Math.round(landmarks[9].x * 1000);
-                    const y = Math.round(landmarks[9].y * 1000);
-                    statusText.innerText = `x: ${x} y: ${y} \nTracking Active!`;
+                    drawLandmarks(canvasCtx, landmarks, {color: '#00ffcc', lineWidth: 1, radius: 3});
+                    
+                    // हवेत तरंगणारे X आणि Y नंबर्स
+                    canvasCtx.fillStyle = '#00ffcc';
+                    canvasCtx.font = '16px monospace';
+                    canvasCtx.shadowColor = "black";
+                    canvasCtx.shadowBlur = 4;
+                    canvasCtx.fillText(`x:${Math.round(landmarks[8].x*1000)} y:${Math.round(landmarks[8].y*1000)}`, landmarks[8].x * w + 10, landmarks[8].y * h);
                 }
-            } else {
-                statusText.innerText = "Bring your hand in front of camera";
+
+                // २. *** खरी जादू: दोन्ही हातांमध्ये डायग्राम बनवणे ***
+                // जर कॅमेऱ्यात २ हात दिसले तर त्यांच्यामध्ये आकृती तयार होईल
+                if (results.multiHandLandmarks.length === 2) {
+                    const hand1 = results.multiHandLandmarks[0];
+                    const hand2 = results.multiHandLandmarks[1];
+
+                    // अंगठे आणि तर्जनी (Index Fingers) चे पॉईंट्स जोडणे
+                    canvasCtx.beginPath();
+                    canvasCtx.moveTo(hand1[8].x * w, hand1[8].y * h); // पहिल्या हाताचे बोट
+                    canvasCtx.lineTo(hand2[8].x * w, hand2[8].y * h); // दुसऱ्या हाताचे बोट
+                    canvasCtx.lineTo(hand2[4].x * w, hand2[4].y * h); // दुसऱ्या हाताचा अंगठा
+                    canvasCtx.lineTo(hand1[4].x * w, hand1[4].y * h); // पहिल्या हाताचा अंगठा
+                    canvasCtx.closePath();
+
+                    // आकृतीमध्ये कलर भरणे (होलोग्राम इफेक्ट)
+                    canvasCtx.fillStyle = 'rgba(0, 255, 204, 0.4)'; // पारदर्शक निळा रंग
+                    canvasCtx.fill();
+                    
+                    // आकृतीला गुलाबी रंगाची बॉर्डर देणे
+                    canvasCtx.strokeStyle = '#ff00ff';
+                    canvasCtx.lineWidth = 3;
+                    canvasCtx.stroke();
+                    
+                    // आकृतीच्या मधे 'Target Locked' असे लिहिणे
+                    canvasCtx.fillStyle = '#ffffff';
+                    canvasCtx.font = 'bold 24px monospace';
+                    const midX = ((hand1[8].x + hand2[8].x) / 2) * w - 50;
+                    const midY = ((hand1[8].y + hand2[8].y) / 2) * h;
+                    canvasCtx.fillText("TARGET LOCKED", midX, midY);
+                }
             }
             canvasCtx.restore();
         }
 
-        // AI मॉडेल सेट करणे
         const hands = new Hands({locateFile: (file) => {
             return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
         }});
         
         hands.setOptions({
-            maxNumHands: 2, // एकाच वेळी २ हात ओळखेल
+            maxNumHands: 2, // २ हात ओळखण्यासाठी सेट केले आहे
             modelComplexity: 1,
             minDetectionConfidence: 0.5,
             minTrackingConfidence: 0.5
         });
         hands.onResults(onResults);
 
-        // कॅमेरा चालू करणे
-        const camera = new Camera(videoElement, {
-            onFrame: async () => {
-                await hands.send({image: videoElement});
-            },
-            width: 1280,
-            height: 720
+        startBtn.addEventListener('click', () => {
+            startBtn.style.display = 'none';
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+                .then((stream) => {
+                    videoElement.srcObject = stream;
+                    videoElement.play();
+                    
+                    const tick = async () => {
+                        if (videoElement.readyState >= 2) {
+                            await hands.send({image: videoElement});
+                        }
+                        requestAnimationFrame(tick);
+                    }
+                    tick();
+                })
+                .catch((err) => alert("कॅमेरा चालू होऊ शकला नाही."));
+            }
         });
-        camera.start();
     </script>
 </body>
 </html>
