@@ -1,182 +1,327 @@
 <!DOCTYPE html>
 <html lang="mr">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Sci-Fi AR Hologram</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
-    
-    <style>
-        body { margin: 0; overflow: hidden; background-color: black; font-family: monospace; }
-        video { display: none; }
-        
-        canvas { 
-            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; 
-            transform: scaleX(-1); 
-            transition: filter 0.2s; 
-        }
-        
-        /* इफेक्ट्स फिल्टर्स */
-        .glitch-active { filter: invert(1) hue-rotate(270deg) contrast(2) saturate(3); }
-        .horror-mode { filter: sepia(1) hue-rotate(320deg) saturate(5) contrast(1.5) brightness(0.8); }
-        
-        #startBtn { 
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            padding: 15px 30px; font-size: 20px; background: #00ffcc; color: black; 
-            border: 2px solid white; border-radius: 10px; z-index: 20; 
-            box-shadow: 0 0 20px #00ffcc; font-weight: bold; cursor: pointer; text-transform: uppercase; 
-        }
-        
-        /* हॅकर टेक्स्ट डिझाईन */
-        #hackerText { 
-            position: absolute; bottom: 30px; left: 20px; color: #00ffcc; 
-            font-size: 16px; z-index: 10; text-shadow: 0 0 5px #00ffcc; 
-        }
-    </style>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta name="theme-color" content="#08070d">
+
+    <title>Shayari & Jokes</title>
+
+    <link rel="stylesheet" href="style.css">
 </head>
+
+
 <body>
 
-    <button id="startBtn">Start Pro Camera</button>
-    <div id="hackerText">SYSTEM INITIATED...<br>AWAITING TARGET...</div>
-    
-    <video id="input_video" autoplay playsinline></video>
-    <canvas id="output_canvas"></canvas>
+    <!-- =========================
+         HOME / DOORS SCREEN
+    ========================== -->
 
-    <script>
-        const videoElement = document.getElementById('input_video');
-        const canvasElement = document.getElementById('output_canvas');
-        const canvasCtx = canvasElement.getContext('2d');
-        const startBtn = document.getElementById('startBtn');
-        const hackerText = document.getElementById('hackerText');
+    <section id="doors">
 
-        let isHorrorMode = false;
+        <div class="logo">
+            ✨ SHAYARI • JOKES
+        </div>
 
-        function resizeCanvas() {
-            canvasElement.width = window.innerWidth;
-            canvasElement.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        <p class="sub">
+            एक दरवाजा निवड आणि आत ये 😄
+        </p>
 
-        // हॅकर टेक्स्ट आपोआप अपडेट करणे
-        const texts = ["ANALYZING ENVIRONMENT...", "ANCIENT PYRAMID DETECTED...", "CALCULATING X, Y COORDS...", "WARNING: UNKNOWN ENTITY NEARBY", "HOLOGRAM PROJECTOR ACTIVE"];
-        setInterval(() => {
-            hackerText.innerHTML += "<br>> " + texts[Math.floor(Math.random() * texts.length)];
-            if (hackerText.innerHTML.split("<br>").length > 6) {
-                hackerText.innerHTML = "> " + texts[Math.floor(Math.random() * texts.length)];
-            }
-        }, 2000);
 
-        // नॉर्मल ग्लिच इफेक्ट
-        setInterval(() => {
-            if(!isHorrorMode && Math.random() > 0.8) { 
-                canvasElement.classList.add('glitch-active');
-                setTimeout(() => canvasElement.classList.remove('glitch-active'), 100); 
-            }
-        }, 1500);
+        <div class="doorWrap">
 
-        function onResults(results) {
-            canvasCtx.save();
-            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-            const w = canvasElement.width;
-            const h = canvasElement.height;
 
-            isHorrorMode = false;
+            <!-- =====================
+                 SAD SHAYARI DOOR
+            ====================== -->
 
-            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                
-                // *** हॉरर मोड ट्रिगर (मूठ बंद केल्यावर) ***
-                const hand1 = results.multiHandLandmarks[0];
-                const dist = Math.hypot(hand1[12].x - hand1[0].x, hand1[12].y - hand1[0].y); // मनगट आणि बोटातील अंतर
-                if (dist < 0.25) { 
-                    isHorrorMode = true; // मूठ बंद आहे
-                }
+            <button
+                class="doorCard"
+                data-type="shayari"
+            >
 
-                if (isHorrorMode) {
-                    canvasElement.classList.add('horror-mode');
-                } else {
-                    canvasElement.classList.remove('horror-mode');
-                }
+                <div class="doorInner">
 
-                // हातावर रेषा आणि नंबर्स काढणे
-                for (const landmarks of results.multiHandLandmarks) {
-                    canvasCtx.setLineDash([2, 4]);
-                    drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {color: isHorrorMode ? '#ff0000' : '#ffffff', lineWidth: 1});
-                    canvasCtx.setLineDash([]); 
-                    drawLandmarks(canvasCtx, landmarks, {color: isHorrorMode ? '#aa0000' : '#00ffcc', lineWidth: 1, radius: 2});
-                    
-                    canvasCtx.fillStyle = isHorrorMode ? '#ff0000' : '#00ffcc';
-                    canvasCtx.font = '14px monospace';
-                    canvasCtx.shadowColor = "black";
-                    canvasCtx.shadowBlur = 3;
-                    canvasCtx.fillText(`x:${Math.round(landmarks[8].x*1000)} y:${Math.round(landmarks[8].y*1000)}`, landmarks[8].x * w + 10, landmarks[8].y * h);
-                }
+                    <div class="emoji">
+                        💔
+                    </div>
 
-                // *** 3D पिरॅमिड होलोग्राम (जेव्हा २ हात दिसतील) ***
-                if (results.multiHandLandmarks.length === 2 && !isHorrorMode) {
-                    const h1 = results.multiHandLandmarks[0];
-                    const h2 = results.multiHandLandmarks[1];
+                    <h2>
+                        Sad Shayari
+                    </h2>
 
-                    const centerX = ((h1[8].x + h2[8].x) / 2) * w;
-                    const centerY = ((h1[8].y + h2[8].y) / 2) * h + 50;
-                    const size = 120;
+                    <span>
+                        मनातील शब्द
+                    </span>
 
-                    // पिरॅमिडचा आकार
-                    canvasCtx.beginPath();
-                    canvasCtx.moveTo(centerX, centerY - size); // वरचे टोक
-                    canvasCtx.lineTo(centerX - size, centerY + size/2); // डावा कोपरा
-                    canvasCtx.lineTo(centerX + size, centerY + size/2); // उजवा कोपरा
-                    canvasCtx.closePath();
-                    
-                    canvasCtx.fillStyle = 'rgba(255, 215, 0, 0.2)'; // सोन्यासारखा चमकणारा रंग
-                    canvasCtx.fill();
-                    canvasCtx.strokeStyle = '#ffd700';
-                    canvasCtx.lineWidth = 2;
-                    canvasCtx.stroke();
+                </div>
 
-                    // पिरॅमिडला 3D लूक देण्यासाठी आतील रेषा
-                    canvasCtx.beginPath();
-                    canvasCtx.moveTo(centerX, centerY - size);
-                    canvasCtx.lineTo(centerX + 30, centerY + size/2 + 10);
-                    canvasCtx.stroke();
 
-                    canvasCtx.fillStyle = '#ffffff';
-                    canvasCtx.font = 'bold 20px monospace';
-                    canvasCtx.fillText("PYRAMID DETECTED", centerX - 90, centerY - size - 20);
-                }
-            } else {
-                 canvasElement.classList.remove('horror-mode');
-            }
-            canvasCtx.restore();
-        }
+                <!-- Left door panel -->
 
-        const hands = new Hands({locateFile: (file) => {
-            return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
-        }});
-        hands.setOptions({ maxNumHands: 2, modelComplexity: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
-        hands.onResults(onResults);
+                <div class="doorPanel left">
+                </div>
 
-        startBtn.addEventListener('click', () => {
-            startBtn.style.display = 'none';
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
-                .then((stream) => { 
-                    videoElement.srcObject = stream; 
-                    videoElement.play(); 
-                    const tick = async () => { 
-                        if (videoElement.readyState >= 2) { await hands.send({image: videoElement}); } 
-                        requestAnimationFrame(tick); 
-                    }; 
-                    tick(); 
-                })
-                .catch((err) => alert("कॅमेऱ्याची परवानगी नाकारली आहे."));
-            }
-        });
-    </script>
+
+                <!-- Right door panel -->
+
+                <div class="doorPanel right">
+                </div>
+
+            </button>
+
+
+
+            <!-- =====================
+                 JOKES DOOR
+            ====================== -->
+
+            <button
+                class="doorCard"
+                data-type="joke"
+            >
+
+                <div class="doorInner">
+
+                    <div class="emoji">
+                        😂
+                    </div>
+
+                    <h2>
+                        Jokes
+                    </h2>
+
+                    <span>
+                        थोडं हसूया
+                    </span>
+
+                </div>
+
+
+                <!-- Left door panel -->
+
+                <div class="doorPanel left">
+                </div>
+
+
+                <!-- Right door panel -->
+
+                <div class="doorPanel right">
+                </div>
+
+            </button>
+
+        </div>
+
+
+        <!-- Guest button -->
+
+        <button
+            id="guestBtn"
+            class="ghostBtn"
+        >
+            👤 Continue as Guest
+        </button>
+
+
+        <!-- Login button -->
+
+        <button
+            id="loginTop"
+            class="linkBtn"
+        >
+            Login / Register
+        </button>
+
+    </section>
+
+
+
+    <!-- =========================
+         MAIN WEBSITE
+    ========================== -->
+
+    <section
+        id="app"
+        class="hidden"
+    >
+
+
+        <!-- =====================
+             NAVBAR
+        ====================== -->
+
+        <header class="nav">
+
+            <b>
+                ✨ Shayari & Jokes
+            </b>
+
+
+            <div>
+
+                <span id="userBadge">
+                </span>
+
+
+                <button
+                    id="authBtn"
+                    class="smallBtn"
+                >
+                    Login
+                </button>
+
+
+                <button
+                    id="logoutBtn"
+                    class="smallBtn hidden"
+                >
+                    Logout
+                </button>
+
+
+                <button
+                    id="homeBtn"
+                    class="smallBtn"
+                >
+                    Home
+                </button>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =====================
+             CONTENT
+        ====================== -->
+
+        <main class="container">
+
+
+            <div class="topRow">
+
+                <div>
+
+                    <h1 id="title">
+                        💔 Sad Shayari
+                    </h1>
+
+                    <p id="subtitle">
+                        Feel every word ❤️
+                    </p>
+
+                </div>
+
+
+                <!-- Create post -->
+
+                <button
+                    id="newPostBtn"
+                    class="primaryBtn"
+                >
+                    ＋ My Post
+                </button>
+
+            </div>
+
+
+
+            <!-- =====================
+                 TABS
+            ====================== -->
+
+            <div class="tabs">
+
+                <button
+                    class="tab active"
+                    data-type="shayari"
+                >
+                    💔 Shayari
+                </button>
+
+
+                <button
+                    class="tab"
+                    data-type="joke"
+                >
+                    😂 Jokes
+                </button>
+
+            </div>
+
+
+
+            <!-- =====================
+                 POSTS
+            ====================== -->
+
+            <div id="feed">
+
+                <!-- JavaScript येथे posts दाखवेल -->
+
+            </div>
+
+        </main>
+
+    </section>
+
+
+
+    <!-- =========================
+         LOGIN / REGISTER MODAL
+    ========================== -->
+
+    <div
+        id="modal"
+        class="modal hidden"
+    >
+
+        <div class="modalBox">
+
+
+            <!-- Close -->
+
+            <button
+                class="close"
+                id="closeModal"
+            >
+                ×
+            </button>
+
+
+            <!-- Login/Register content
+                 JavaScript येथे टाकेल -->
+
+            <div id="modalContent">
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Toast message -->
+
+    <div id="toast">
+    </div>
+
+
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================== -->
+
+    <script src="app.js"></script>
+
 </body>
+
 </html>
