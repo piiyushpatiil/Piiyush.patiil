@@ -1,774 +1,403 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Dil & Hasi | शायरी आणि जोक्स</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Rozha+One&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dil & Hasi | शायरी आणि जोक्स</title>
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
-<style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    -webkit-tap-highlight-color:transparent;
-}
-
-body{
-    min-height:100vh;
-    font-family:'Poppins', sans-serif;
-    background:#0a0a14;
-    color:#fff;
-    overflow-x:hidden;
-}
-
-/* Background Canvas */
-#particle-canvas{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    z-index:0;
-    pointer-events:none;
-}
-
-/* ================= HOME / DOORS SCREEN ================= */
-#home{
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:20px 15px;
-    position:relative;
-    z-index:10;
-}
-
-.logo-container{
-    text-align:center;
-    margin-bottom:12px;
-}
-
-.logo{
-    font-size:26px;
-    font-weight:700;
-    letter-spacing:2px;
-    background:linear-gradient(45deg, #ff758c, #ff7eb3, #70a1ff);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-}
-
-.subtitle{
-    font-size:13px;
-    color:#8b949e;
-    margin-top:2px;
-}
-
-.door-wrapper-title{
-    margin:15px 0 20px;
-    font-size:15px;
-    color:#e0e0e0;
-    font-weight:600;
-}
-
-/* Door Layout */
-.door-area{
-    width:100%;
-    max-width:650px;
-    display:flex;
-    flex-direction:column;
-    gap:16px;
-    perspective:1200px;
-}
-
-@media(min-width: 600px){
-    .door-area{
-        flex-direction:row;
-        height:340px;
-        gap:20px;
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Roboto, sans-serif;
     }
-}
 
-.door-card{
-    position:relative;
-    width:100%;
-    height:175px;
-    cursor:pointer;
-    border-radius:18px;
-    overflow:hidden;
-    background:#161724;
-    border:2px solid rgba(255,255,255,0.12);
-    box-shadow:0 12px 30px rgba(0,0,0,0.6);
-}
-
-@media(min-width: 600px){
-    .door-card{
-        height:100%;
-        flex:1;
+    body {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 15px;
+      overflow-x: hidden;
     }
-}
 
-.door-bg{
-    position:absolute;
-    inset:0;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    z-index:1;
-    pointer-events:none;
-}
+    /* Header & Auth */
+    header {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 10px 15px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
 
-.door-left .door-bg{
-    background:linear-gradient(135deg, #32132e, #130716);
-}
+    .logo {
+      font-size: 1.3rem;
+      font-weight: bold;
+      background: linear-gradient(45deg, #ff416c, #ff4b2b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-.door-right .door-bg{
-    background:linear-gradient(135deg, #102737, #06111a);
-}
+    .auth-btn {
+      background: linear-gradient(45deg, #4285F4, #34A853);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.85rem;
+      transition: 0.3s;
+    }
 
-.door-icon{
-    font-size:42px;
-    margin-bottom:6px;
-}
+    /* 3D Doors Section */
+    .doors-container {
+      display: flex;
+      gap: 15px;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 25px;
+      perspective: 1000px;
+    }
 
-.door-title{
-    font-size:22px;
-    font-weight:700;
-}
+    .door-wrapper {
+      flex: 1;
+      height: 120px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 15px;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
 
-.door-small{
-    font-size:12px;
-    color:#aaa;
-}
+    .door {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: left;
+    }
 
-/* Door Panels Animation */
-.door-leaf{
-    position:absolute;
-    top:0;
-    width:50%;
-    height:100%;
-    z-index:4;
-    background:rgba(23, 25, 38, 0.95);
-    border:1px solid rgba(255,255,255,0.1);
-    transition:transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
-    pointer-events:none;
-}
+    .door.shayari { background: linear-gradient(135deg, #833ab4, #fd1d1d); }
+    .door.jokes { background: linear-gradient(135deg, #f12711, #f5af19); }
 
-.door-leaf.left{
-    left:0;
-    transform-origin:left center;
-    border-right:2px solid rgba(255,255,255,0.2);
-}
+    .door-wrapper.active .door {
+      transform: rotateY(-110deg);
+    }
 
-.door-leaf.right{
-    right:0;
-    transform-origin:right center;
-    border-left:2px solid rgba(255,255,255,0.2);
-}
+    .door-inside {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #00ffcc;
+      z-index: -1;
+    }
 
-.door-card.open .door-leaf.left{
-    transform:rotateY(-115deg);
-}
+    /* Post Feed */
+    .feed {
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
 
-.door-card.open .door-leaf.right{
-    transform:rotateY(115deg);
-}
+    .post-card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
 
-.door-handle{
-    width:8px;
-    height:30px;
-    background:#ffd35c;
-    border-radius:4px;
-    position:absolute;
-    top:50%;
-    transform:translateY(-50%);
-    box-shadow:0 0 10px rgba(255,211,92,0.7);
-}
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: #bbb;
+      margin-bottom: 10px;
+    }
 
-.door-leaf.left .door-handle{ right:8px; }
-.door-leaf.right .door-handle{ left:8px; }
+    .post-content {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      margin-bottom: 15px;
+      white-space: pre-line;
+    }
 
-#home.hidden{
-    display:none !important;
-}
+    .post-actions {
+      display: flex;
+      gap: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 10px;
+      align-items: center;
+    }
 
-/* ================= MAIN APP ================= */
-#app{
-    display:none;
-    min-height:100vh;
-    position:relative;
-    z-index:10;
-    padding-bottom:40px;
-}
+    .action-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.9rem;
+    }
 
-#app.show{
-    display:block;
-    animation:fadeIn 0.5s ease;
-}
+    /* Floating Add Post Button */
+    .fab {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: linear-gradient(45deg, #ff416c, #ff4b2b);
+      color: white;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-@keyframes fadeIn{
-    from{ opacity:0; transform:translateY(15px); }
-    to{ opacity:1; transform:translateY(0); }
-}
+    /* Modal Form */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
 
-.navbar{
-    height:60px;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 15px;
-    background:rgba(15,16,24,0.95);
-    border-bottom:1px solid rgba(255,255,255,0.1);
-    position:sticky;
-    top:0;
-    z-index:100;
-}
+    .modal-content {
+      background: #24243e;
+      padding: 20px;
+      border-radius: 15px;
+      width: 100%;
+      max-width: 450px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
 
-.nav-brand{
-    font-size:18px;
-    font-weight:700;
-    background:linear-gradient(45deg, #ff7eb3, #70a1ff);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-}
+    .modal-content textarea, .modal-content select, .modal-content input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #1a1a2e;
+      color: white;
+    }
 
-.back-btn{
-    border:1px solid rgba(255,255,255,0.2);
-    background:rgba(255,255,255,0.1);
-    color:#fff;
-    padding:6px 12px;
-    border-radius:8px;
-    font-size:13px;
-    cursor:pointer;
-}
-
-.container{
-    width:min(600px, 92vw);
-    margin:20px auto 0;
-}
-
-.app-header{
-    text-align:center;
-    margin-bottom:15px;
-}
-
-.app-title{
-    font-size:24px;
-    font-weight:700;
-}
-
-.app-sub{
-    font-size:13px;
-    color:#8b949e;
-}
-
-.tabs-container{
-    display:flex;
-    background:rgba(255,255,255,0.06);
-    padding:4px;
-    border-radius:12px;
-    margin-bottom:20px;
-}
-
-.tab-btn{
-    flex:1;
-    padding:10px;
-    border:0;
-    background:transparent;
-    color:#8b949e;
-    font-size:14px;
-    font-weight:600;
-    border-radius:8px;
-    cursor:pointer;
-}
-
-.tab-btn.active{
-    background:rgba(255,255,255,0.16);
-    color:#fff;
-}
-
-/* Card View */
-.content-card{
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(255,255,255,0.12);
-    border-radius:18px;
-    padding:25px 20px;
-    box-shadow:0 15px 35px rgba(0,0,0,0.5);
-}
-
-.card-badge{
-    font-size:11px;
-    font-weight:700;
-    padding:3px 10px;
-    border-radius:10px;
-    background:rgba(255,117,140,0.15);
-    color:#ff758c;
-    display:inline-block;
-    margin-bottom:12px;
-}
-
-.card-body-text{
-    font-size:19px;
-    line-height:1.7;
-    text-align:center;
-    margin:10px 0 20px;
-    min-height:75px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-family:'Rozha One', serif;
-}
-
-.card-author{
-    text-align:right;
-    color:#8b949e;
-    font-size:13px;
-    border-bottom:1px solid rgba(255,255,255,0.08);
-    padding-bottom:12px;
-}
-
-.action-grid{
-    display:grid;
-    grid-template-columns:repeat(3, 1fr);
-    gap:8px;
-    margin-top:15px;
-}
-
-.btn-action{
-    border:1px solid rgba(255,255,255,0.1);
-    background:rgba(255,255,255,0.06);
-    color:#fff;
-    padding:10px 4px;
-    border-radius:10px;
-    cursor:pointer;
-    font-size:12px;
-}
-
-.btn-action.liked{
-    color:#ff4757;
-    background:rgba(255,71,87,0.15);
-    border-color:#ff4757;
-}
-
-.rating-section{
-    text-align:center;
-    margin-top:15px;
-}
-
-.star-group{
-    display:flex;
-    justify-content:center;
-    gap:6px;
-    margin-top:4px;
-}
-
-.star-icon{
-    font-size:24px;
-    color:#484f58;
-    cursor:pointer;
-}
-
-.star-icon.active{
-    color:#ffa502;
-}
-
-.comment-container{
-    margin-top:15px;
-    display:none;
-}
-
-.comment-container.open{
-    display:block;
-}
-
-.comment-textarea{
-    width:100%;
-    min-height:65px;
-    background:rgba(0,0,0,0.3);
-    border:1px solid rgba(255,255,255,0.15);
-    border-radius:10px;
-    padding:10px;
-    color:#fff;
-    font-size:13px;
-    outline:none;
-}
-
-.comment-submit{
-    margin-top:6px;
-    padding:6px 14px;
-    border:0;
-    border-radius:6px;
-    background:#70a1ff;
-    color:#000;
-    font-weight:600;
-    font-size:12px;
-    cursor:pointer;
-}
-
-.comment-list{
-    margin-top:10px;
-    max-height:120px;
-    overflow-y:auto;
-}
-
-.single-comment{
-    background:rgba(255,255,255,0.05);
-    padding:6px 10px;
-    border-radius:6px;
-    font-size:12px;
-    margin-bottom:4px;
-}
-
-.nav-controls{
-    display:flex;
-    justify-content:space-between;
-    margin-top:18px;
-    gap:10px;
-}
-
-.btn-ctrl{
-    flex:1;
-    padding:12px;
-    border-radius:10px;
-    border:1px solid rgba(255,255,255,0.12);
-    background:rgba(255,255,255,0.08);
-    color:#fff;
-    font-size:14px;
-    font-weight:600;
-    cursor:pointer;
-}
-</style>
+    .modal-content button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      background: #ff416c;
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
 </head>
-
 <body>
 
-<canvas id="particle-canvas"></canvas>
+  <header>
+    <div class="logo">✨ Dil & Hasi</div>
+    <button id="auth-btn" class="auth-btn" onclick="handleAuth()">Google Login</button>
+  </header>
 
-<!-- ================= HOME / DOORS ================= -->
-<section id="home">
-    <div class="logo-container">
-        <div class="logo">✨ DIL & HASI</div>
-        <div class="subtitle">शायरी आणि मजेदार जोक्सचे जग</div>
+  <!-- Doors -->
+  <div class="doors-container">
+    <div class="door-wrapper" id="door-shayari" onclick="toggleDoor('shayari')">
+      <div class="door shayari">💔 दर्दभरी शायरी</div>
+      <div class="door-inside">Loading...</div>
     </div>
-
-    <div class="door-wrapper-title">दरवाजावर टच करा आणि आत या 👇</div>
-
-    <div class="door-area">
-        <!-- SHAYARI DOOR -->
-        <div class="door-card door-left" onclick="openDoorNow('shayari')">
-            <div class="door-bg">
-                <div class="door-icon">💔</div>
-                <div class="door-title">Sad Shayari</div>
-                <div class="door-small">दिलाला स्पर्श करणारे शब्द</div>
-            </div>
-            <div class="door-leaf left"><div class="door-handle"></div></div>
-            <div class="door-leaf right"></div>
-        </div>
-
-        <!-- JOKES DOOR -->
-        <div class="door-card door-right" onclick="openDoorNow('jokes')">
-            <div class="door-bg">
-                <div class="door-icon">😂</div>
-                <div class="door-title">Funny Jokes</div>
-                <div class="door-small">हसून लोटपोट व्हा</div>
-            </div>
-            <div class="door-leaf left"></div>
-            <div class="door-leaf right"><div class="door-handle"></div></div>
-        </div>
+    <div class="door-wrapper" id="door-jokes" onclick="toggleDoor('jokes')">
+      <div class="door jokes">😂 धम्माल जोक्स</div>
+      <div class="door-inside">Loading...</div>
     </div>
-</section>
+  </div>
 
-<!-- ================= APP INTERFACE ================= -->
-<section id="app">
-    <nav class="navbar">
-        <div class="nav-brand">✨ Dil & Hasi</div>
-        <button class="back-btn" onclick="backToHome()">🏠 मागे जा</button>
-    </nav>
+  <!-- Feed -->
+  <div class="feed" id="feed">
+    <div style="text-align: center; color: #888;">लोड होत आहे...</div>
+  </div>
 
-    <main class="container">
-        <div class="app-header">
-            <h1 class="app-title" id="appHeaderTitle">Sad Shayari</h1>
-            <p class="app-sub" id="appHeaderSubtitle">Feel every word ❤️</p>
-        </div>
+  <!-- Add Post FAB -->
+  <button class="fab" onclick="openModal()">➕</button>
 
-        <div class="tabs-container">
-            <button class="tab-btn active" id="tabShayari" onclick="switchCategory('shayari')">💔 शायरी</button>
-            <button class="tab-btn" id="tabJokes" onclick="switchCategory('jokes')">😂 जोक्स</button>
-        </div>
+  <!-- Add Post Modal -->
+  <div class="modal" id="postModal">
+    <div class="modal-content">
+      <h3>नवीन पोस्ट करा</h3>
+      <select id="postCategory">
+        <option value="shayari">💔 दर्दभरी शायरी</option>
+        <option value="jokes">😂 धम्माल जोक्स</option>
+      </select>
+      <textarea id="postText" rows="4" placeholder="येथे तुमची शायरी किंवा जोक लिहा..."></textarea>
+      <button onclick="submitPost()">पोस्ट अपलोड करा</button>
+      <button style="background: #555; margin-top: 5px;" onclick="closeModal()">रद्द करा</button>
+    </div>
+  </div>
 
-        <div id="cardRenderer"></div>
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyObiMMjsay7Bv2nODc93Jhb908UtV6SPuo",
+      authDomain: "piiyush-patii.firebaseapp.com",
+      projectId: "piiyush-patii",
+      storageBucket: "piiyush-patii.firebasestorage.app",
+      messagingSenderId: "943004269137",
+      appId: "1:943004269137:web:13e65558654621d4855670",
+      measurementId: "G-QLKC2N0RWN"
+    };
 
-        <div class="nav-controls">
-            <button class="btn-ctrl" onclick="moveSlide(-1)">← मागे</button>
-            <button class="btn-ctrl" onclick="moveSlide(1)">पुढे →</button>
-        </div>
-    </main>
-</section>
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-<script>
-/* 7 SHAYARI + 7 JOKES */
-const database = {
-    shayari: [
-        {
-            text: "कभी कभी किसी की खामोशी भी\nसब कुछ बयां कर देती है।",
-            author: "— खामोश दिल"
-        },
-        {
-            text: "हमने तो समझा था कि हम ही खास हैं,\nपर वक्त ने बता दिया कि हम सिर्फ एक वक्त का सहारा थे।",
-            author: "— तन्हा मुसाफिर"
-        },
-        {
-            text: "छोड़ दिया हमने भी लोगों को बेवजह परेशान करना,\nजब कोई अपना समझेगा तो खुद याद कर लेगा।",
-            author: "— टूटा साया"
-        },
-        {
-            text: "मुस्कुराने की आदत भी कितनी अजीब है,\nगम को छुपा लेती है और दुनिया समझती है कोई दर्द नहीं।",
-            author: "— अनजान शायर"
-        },
-        {
-            text: "बहुत अंदर तक तबाह कर देते हैं,\nवो अश्क जो आँखों से कभी बह नहीं पाते।",
-            author: "— अकेला राही"
-        },
-        {
-            text: "रिश्ते कभी अपने आप नहीं टूटते,\nबस किसी का दिल भर जाता है या कोई बेहतर मिल जाता है।",
-            author: "— दर्द का सफर"
-        },
-        {
-            text: "हम तो समझे थे कि हम ही उनके अपने हैं,\nलेकिन वो तो हर किसी के साथ अपनेपन का नाटक करते थे।",
-            author: "— खामोश लफ्ज़"
-        }
-    ],
-    jokes: [
-        {
-            text: "मास्तर: संजू, काल शाळेत का आला नव्हतास?\nसंजू: सर, स्वप्नात देवी आली आणि म्हणाली आज आराम कर! 😂",
-            author: "— संजू बाबा"
-        },
-        {
-            text: "पप्पू: लग्नानंतर माणसात काय बदल होतो?\nगप्पू: आधी स्वतःच्या मनाचं ऐकायचो, आता बायकोचं ऐकावं लागतं! 🤣",
-            author: "— गप्पू मास्टर"
-        },
-        {
-            text: "डॉक्टर: वजन कमी करण्यासाठी रोज 5 किमी धावत जा.\nपप्पू: 15 दिवसांत 75 किमी दूर पोहोचलोय, आता परत कसं येऊ? 🏃‍♂️😂",
-            author: "— पप्पू द ग्रेट"
-        },
-        {
-            text: "मुलगा: बाबा, मला लग्न करायचं आहे!\nबाबा: आधी माफी माग.\nमुलगा: कशासाठी बाबा?\nबाबा: आधी माफी माग!\nमुलगा: सॉरी बाबा...\nबाबा: शाब्बास! आता तू लग्नासाठी तयार आहेस! 🤣",
-            author: "— देशी कॉमेडी"
-        },
-        {
-            text: "आई: फोन खाली ठेव आणि अभ्यास कर!\nपप्पू: फोन खाली ठेवला आई... आता अभ्यास कुठे शोधू? 😂",
-            author: "— पप्पू"
-        },
-        {
-            text: "दुकानदार: साहेब, हा साबण घ्या, चेहरा उजळेल.\nग्राहक: आणि जर नाही उजळला तर?\nदुकानदार: मग समजायचं की नशिबातच अंधार आहे! 😆",
-            author: "— जोक्स अड्डा"
-        },
-        {
-            text: "परीक्षेत प्रश्न आला: 'Explain your answer.'\nमी लिहिलं: माझं उत्तर मलाच समजलं नाही, मी तुम्हाला काय समजावू? 😜",
-            author: "— बॅकबेंचर"
-        }
-    ]
-};
+    let currentUser = null;
+    let currentCategory = 'shayari';
 
-let currentTab = "shayari";
-let activeIndex = 0;
+    // Auth Listener
+    auth.onAuthStateChanged(user => {
+      currentUser = user;
+      const btn = document.getElementById('auth-btn');
+      if (user) {
+        btn.innerText = `बाहेर पडा (${user.displayName.split(' ')[0]})`;
+      } else {
+        btn.innerText = "Google Login";
+      }
+    });
 
-function openDoorNow(selected){
-    currentTab = selected;
-    activeIndex = 0;
-
-    const clickedCard = selected === 'shayari' 
-        ? document.querySelector('.door-left') 
-        : document.querySelector('.door-right');
-
-    clickedCard.classList.add('open');
-
-    setTimeout(() => {
-        document.getElementById("home").classList.add("hidden");
-        const app = document.getElementById("app");
-        app.classList.add("show");
-        switchCategory(selected);
-    }, 700);
-}
-
-function backToHome(){
-    const app = document.getElementById("app");
-    app.classList.remove("show");
-
-    const home = document.getElementById("home");
-    home.classList.remove("hidden");
-    document.querySelectorAll(".door-card").forEach(d => d.classList.remove("open"));
-}
-
-function switchCategory(cat){
-    currentTab = cat;
-    activeIndex = 0;
-
-    document.getElementById("tabShayari").classList.toggle("active", cat === "shayari");
-    document.getElementById("tabJokes").classList.toggle("active", cat === "jokes");
-
-    if(cat === "shayari"){
-        document.getElementById("appHeaderTitle").innerText = "💔 दर्द भरी शायरी";
-        document.getElementById("appHeaderSubtitle").innerText = "शब्दांमधील भावना अनुभवा...";
-    } else {
-        document.getElementById("appHeaderTitle").innerText = "😂 धम्माल जोक्स";
-        document.getElementById("appHeaderSubtitle").innerText = "हसा आणि तणाव दूर करा!";
+    function handleAuth() {
+      if (currentUser) {
+        auth.signOut();
+      } else {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider).catch(err => alert(err.message));
+      }
     }
 
-    displayCard();
-}
+    // Door Selector
+    function toggleDoor(type) {
+      currentCategory = type;
+      document.getElementById('door-shayari').classList.toggle('active', type === 'shayari');
+      document.getElementById('door-jokes').classList.toggle('active', type === 'jokes');
+      loadPosts(type);
+    }
 
-function displayCard(){
-    const item = database[currentTab][activeIndex];
-    const key = `${currentTab}_${activeIndex}`;
-
-    const likes = Number(localStorage.getItem(`${key}_likes`) || 0);
-    const hasLiked = localStorage.getItem(`${key}_liked`) === "true";
-    const rating = Number(localStorage.getItem(`${key}_rating`) || 0);
-    const comments = JSON.parse(localStorage.getItem(`${key}_comments`) || "[]");
-
-    document.getElementById("cardRenderer").innerHTML = `
-        <article class="content-card">
-            <span class="card-badge">${currentTab === "shayari" ? "❤️ SHAYARI" : "⚡ JOKE"}</span>
-            <div class="card-body-text">${cleanHTML(item.text).replace(/\n/g, "<br>")}</div>
-            <div class="card-author">${cleanHTML(item.author)}</div>
-
-            <div class="action-grid">
-                <button class="btn-action ${hasLiked ? 'liked' : ''}" onclick="togglePostLike()">
-                    ${hasLiked ? '❤️' : '🤍'} ${likes}
-                </button>
-                <button class="btn-action" onclick="toggleCommentSection()">
-                    💬 ${comments.length}
-                </button>
-                <button class="btn-action" onclick="sharePost()">
-                    📤 Share
-                </button>
-            </div>
-
-            <div class="rating-section">
-                <div class="star-group">
-                    ${[1, 2, 3, 4, 5].map(s => `
-                        <span class="star-icon ${s <= rating ? 'active' : ''}" onclick="giveRating(${s})">★</span>
-                    `).join('')}
+    // Load Posts
+    function loadPosts(category) {
+      db.collection("posts")
+        .where("category", "==", category)
+        .onSnapshot(snapshot => {
+          const feed = document.getElementById('feed');
+          feed.innerHTML = "";
+          if (snapshot.empty) {
+            feed.innerHTML = `<div style="text-align: center; color: #888;">या विभागात अजून कोणतीही पोस्ट नाही. पहिली पोस्ट तुम्ही करा!</div>`;
+            return;
+          }
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            feed.innerHTML += `
+              <div class="post-card">
+                <div class="post-header">
+                  <span>✍️ ${data.author || 'Anonymous'}</span>
+                  <span>${data.likes || 0} Likes</span>
                 </div>
-            </div>
-
-            <div id="commentBoxArea" class="comment-container">
-                <textarea id="commentInputArea" class="comment-textarea" placeholder="कमेंट लिहा..."></textarea>
-                <button class="comment-submit" onclick="submitUserComment()">पोस्ट करा</button>
-                <div class="comment-list">
-                    ${comments.map(c => `<div class="single-comment">💬 ${cleanHTML(c)}</div>`).join('')}
+                <div class="post-content">${data.text}</div>
+                <div class="post-actions">
+                  <button class="action-btn" onclick="likePost('${doc.id}', ${data.likes || 0})">❤️ Like</button>
+                  <button class="action-btn" onclick="sharePost('${data.text}')">📤 Share</button>
                 </div>
-            </div>
-        </article>
-    `;
-}
-
-function togglePostLike(){
-    const key = `${currentTab}_${activeIndex}`;
-    let likes = Number(localStorage.getItem(`${key}_likes`) || 0);
-    let hasLiked = localStorage.getItem(`${key}_liked`) === "true";
-
-    if(hasLiked){
-        likes = Math.max(0, likes - 1);
-        localStorage.setItem(`${key}_liked`, "false");
-    } else {
-        likes++;
-        localStorage.setItem(`${key}_liked`, "true");
+              </div>
+            `;
+          });
+        });
     }
 
-    localStorage.setItem(`${key}_likes`, likes);
-    displayCard();
-}
-
-function giveRating(score){
-    localStorage.setItem(`${currentTab}_${activeIndex}_rating`, score);
-    displayCard();
-}
-
-function toggleCommentSection(){
-    document.getElementById("commentBoxArea")?.classList.toggle("open");
-}
-
-function submitUserComment(){
-    const input = document.getElementById("commentInputArea");
-    const val = input.value.trim();
-    if(!val) return;
-
-    const key = `${currentTab}_${activeIndex}`;
-    const comments = JSON.parse(localStorage.getItem(`${key}_comments`) || "[]");
-    comments.unshift(val);
-    localStorage.setItem(`${key}_comments`, JSON.stringify(comments));
-
-    displayCard();
-    setTimeout(() => {
-        document.getElementById("commentBoxArea")?.classList.add("open");
-    }, 10);
-}
-
-function moveSlide(dir){
-    const len = database[currentTab].length;
-    activeIndex = (activeIndex + dir + len) % len;
-    displayCard();
-}
-
-function sharePost(){
-    const item = database[currentTab][activeIndex];
-    if(navigator.share){
-        navigator.share({ title: "Dil & Hasi", text: item.text });
-    } else {
-        navigator.clipboard.writeText(item.text).then(() => alert("कॉपी झाले! 📋"));
+    // Like Post
+    function likePost(id, currentLikes) {
+      db.collection("posts").doc(id).update({
+        likes: currentLikes + 1
+      });
     }
-}
 
-function cleanHTML(str){
-    return str.replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[m]));
-}
-
-/* Background Canvas */
-const canvas = document.getElementById('particle-canvas');
-const ctx = canvas.getContext('2d');
-let particles = [];
-
-function resize(){
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-window.addEventListener('resize', resize);
-resize();
-
-class P {
-    constructor(){ this.reset(); }
-    reset(){
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 0.5;
-        this.speedY = Math.random() * 0.4 + 0.1;
-        this.op = Math.random() * 0.3 + 0.1;
+    // Share Post
+    function sharePost(text) {
+      if (navigator.share) {
+        navigator.share({ title: 'Dil & Hasi Post', text: text });
+      } else {
+        navigator.clipboard.writeText(text);
+        alert("पोस्ट कॉपी झाली आहे!");
+      }
     }
-    update(){
-        this.y -= this.speedY;
-        if(this.y < 0) this.y = canvas.height;
-    }
-    draw(){
-        ctx.fillStyle = `rgba(255,255,255,${this.op})`;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-    }
-}
 
-for(let i = 0; i < 25; i++) particles.push(new P());
+    // Modal Operations
+    function openModal() {
+      if (!currentUser) {
+        alert("कृपया पोस्ट करण्यासाठी आधी वरून Google Login करा!");
+        return;
+      }
+      document.getElementById('postModal').style.display = 'flex';
+    }
 
-function loop(){
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach(p => { p.update(); p.draw(); });
-    requestAnimationFrame(loop);
-}
-loop();
-</script>
+    function closeModal() {
+      document.getElementById('postModal').style.display = 'none';
+    }
+
+    function submitPost() {
+      const text = document.getElementById('postText').value.trim();
+      const category = document.getElementById('postCategory').value;
+      if (!text) return alert("कृपया मजकूर टाईप करा!");
+
+      db.collection("posts").add({
+        text: text,
+        category: category,
+        author: currentUser.displayName,
+        likes: 0,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        document.getElementById('postText').value = "";
+        closeModal();
+      });
+    }
+
+    // Default Load
+    toggleDoor('shayari');
+  </script>
 </body>
 </html>
