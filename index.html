@@ -2,7 +2,7 @@
 <html lang="hi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Dil & Hasi | शायरी आणि जोक्स</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Rozha+One&display=swap" rel="stylesheet">
 
@@ -17,18 +17,18 @@
 body{
     min-height:100vh;
     font-family:'Poppins', sans-serif;
-    background:radial-gradient(circle at top, #1f1a3a 0%, #0c0d14 60%, #050508 100%);
+    background:#0a0a14;
     color:#fff;
     overflow-x:hidden;
 }
 
-/* ================= BACKGROUND PARTICLES ================= */
+/* Background Canvas */
 #particle-canvas{
     position:fixed;
     top:0;
     left:0;
-    width:100vw;
-    height:100vh;
+    width:100%;
+    height:100%;
     z-index:0;
     pointer-events:none;
 }
@@ -40,69 +40,75 @@ body{
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    padding:20px;
+    padding:20px 15px;
     position:relative;
-    z-index:5;
-    transition:opacity 0.6s ease, transform 0.6s ease;
+    z-index:10;
 }
 
 .logo-container{
     text-align:center;
-    margin-bottom:20px;
+    margin-bottom:12px;
 }
 
 .logo{
-    font-size:28px;
+    font-size:26px;
     font-weight:700;
     letter-spacing:2px;
     background:linear-gradient(45deg, #ff758c, #ff7eb3, #70a1ff);
     -webkit-background-clip:text;
     -webkit-text-fill-color:transparent;
-    text-shadow:0 10px 20px rgba(255,117,140,0.2);
 }
 
 .subtitle{
-    font-size:14px;
-    color:#a0a5b5;
-    margin-top:4px;
+    font-size:13px;
+    color:#8b949e;
+    margin-top:2px;
 }
 
 .door-wrapper-title{
-    margin-bottom:25px;
-    font-size:16px;
+    margin:15px 0 20px;
+    font-size:15px;
     color:#e0e0e0;
-    letter-spacing:1px;
     font-weight:600;
-    text-shadow:0 0 10px rgba(255,255,255,0.2);
 }
 
-/* 3D Door Area */
+/* Door Layout */
 .door-area{
-    width:min(800px, 92vw);
+    width:100%;
+    max-width:650px;
     display:flex;
-    gap:20px;
+    flex-direction:column;
+    gap:16px;
     perspective:1200px;
 }
 
+@media(min-width: 600px){
+    .door-area{
+        flex-direction:row;
+        height:340px;
+        gap:20px;
+    }
+}
+
 .door-card{
-    flex:1;
-    height:380px;
     position:relative;
+    width:100%;
+    height:175px;
     cursor:pointer;
-    border-radius:20px;
+    border-radius:18px;
     overflow:hidden;
-    background:rgba(255, 255, 255, 0.03);
-    border:2px solid rgba(255, 255, 255, 0.12);
-    box-shadow:0 20px 50px rgba(0,0,0,0.6);
-    transition:transform 0.3s ease, border-color 0.3s ease;
+    background:#161724;
+    border:2px solid rgba(255,255,255,0.12);
+    box-shadow:0 12px 30px rgba(0,0,0,0.6);
 }
 
-.door-card:hover{
-    transform:translateY(-6px);
-    border-color:rgba(255, 255, 255, 0.3);
+@media(min-width: 600px){
+    .door-card{
+        height:100%;
+        flex:1;
+    }
 }
 
-/* Content Behind The Door */
 .door-bg{
     position:absolute;
     inset:0;
@@ -110,88 +116,83 @@ body{
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    padding:20px;
     text-align:center;
     z-index:1;
+    pointer-events:none;
 }
 
 .door-left .door-bg{
-    background:linear-gradient(145deg, #3d1b38, #160a1a);
+    background:linear-gradient(135deg, #32132e, #130716);
 }
 
 .door-right .door-bg{
-    background:linear-gradient(145deg, #18384e, #091722);
+    background:linear-gradient(135deg, #102737, #06111a);
 }
 
 .door-icon{
-    font-size:60px;
-    margin-bottom:12px;
-    filter:drop-shadow(0 8px 15px rgba(0,0,0,0.4));
-}
-
-.door-title{
-    font-size:24px;
-    font-weight:700;
+    font-size:42px;
     margin-bottom:6px;
 }
 
-.door-small{
-    font-size:13px;
-    color:#ccc;
+.door-title{
+    font-size:22px;
+    font-weight:700;
 }
 
-/* Real Animated 3D Doors */
+.door-small{
+    font-size:12px;
+    color:#aaa;
+}
+
+/* Door Panels Animation */
 .door-leaf{
     position:absolute;
     top:0;
     width:50%;
     height:100%;
-    z-index:3;
-    background:linear-gradient(135deg, rgba(255,255,255,0.12), rgba(20,20,30,0.85));
-    backdrop-filter:blur(4px);
-    border:1px solid rgba(255,255,255,0.15);
-    transition:transform 0.9s cubic-bezier(0.77, 0, 0.175, 1);
+    z-index:4;
+    background:rgba(23, 25, 38, 0.95);
+    border:1px solid rgba(255,255,255,0.1);
+    transition:transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
     pointer-events:none;
 }
 
 .door-leaf.left{
     left:0;
     transform-origin:left center;
-    border-right:1px solid rgba(255,255,255,0.25);
+    border-right:2px solid rgba(255,255,255,0.2);
 }
 
 .door-leaf.right{
     right:0;
     transform-origin:right center;
-    border-left:1px solid rgba(255,255,255,0.25);
+    border-left:2px solid rgba(255,255,255,0.2);
 }
 
 .door-card.open .door-leaf.left{
-    transform:rotateY(-110deg);
+    transform:rotateY(-115deg);
 }
 
 .door-card.open .door-leaf.right{
-    transform:rotateY(110deg);
+    transform:rotateY(115deg);
 }
 
 .door-handle{
-    width:10px;
-    height:34px;
-    background:linear-gradient(180deg, #ffeaa7, #d69e2e);
-    border-radius:6px;
+    width:8px;
+    height:30px;
+    background:#ffd35c;
+    border-radius:4px;
     position:absolute;
     top:50%;
     transform:translateY(-50%);
-    box-shadow:0 0 10px rgba(255, 234, 167, 0.5);
+    box-shadow:0 0 10px rgba(255,211,92,0.7);
 }
 
-.door-leaf.left .door-handle{ right:10px; }
-.door-leaf.right .door-handle{ left:10px; }
+.door-leaf.left .door-handle{ right:8px; }
+.door-leaf.right .door-handle{ left:8px; }
 
 #home.hidden{
-    opacity:0;
-    transform:scale(1.05);
-    pointer-events:none;
+    display:none !important;
 }
 
 /* ================= MAIN APP ================= */
@@ -200,27 +201,26 @@ body{
     min-height:100vh;
     position:relative;
     z-index:10;
-    padding-bottom:50px;
+    padding-bottom:40px;
 }
 
 #app.show{
     display:block;
-    animation:appFadeIn 0.6s ease forwards;
+    animation:fadeIn 0.5s ease;
 }
 
-@keyframes appFadeIn{
-    from{ opacity:0; transform:translateY(25px); }
+@keyframes fadeIn{
+    from{ opacity:0; transform:translateY(15px); }
     to{ opacity:1; transform:translateY(0); }
 }
 
 .navbar{
-    height:65px;
+    height:60px;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:0 20px;
-    background:rgba(12, 13, 20, 0.85);
-    backdrop-filter:blur(15px);
+    padding:0 15px;
+    background:rgba(15,16,24,0.95);
     border-bottom:1px solid rgba(255,255,255,0.1);
     position:sticky;
     top:0;
@@ -228,7 +228,7 @@ body{
 }
 
 .nav-brand{
-    font-size:19px;
+    font-size:18px;
     font-weight:700;
     background:linear-gradient(45deg, #ff7eb3, #70a1ff);
     -webkit-background-clip:text;
@@ -237,273 +237,208 @@ body{
 
 .back-btn{
     border:1px solid rgba(255,255,255,0.2);
-    background:rgba(255,255,255,0.08);
+    background:rgba(255,255,255,0.1);
     color:#fff;
-    padding:7px 15px;
-    border-radius:10px;
+    padding:6px 12px;
+    border-radius:8px;
+    font-size:13px;
     cursor:pointer;
-    font-size:14px;
-}
-
-.back-btn:hover{
-    background:rgba(255,255,255,0.18);
 }
 
 .container{
-    width:min(640px, 92vw);
-    margin:25px auto 0;
+    width:min(600px, 92vw);
+    margin:20px auto 0;
 }
 
 .app-header{
     text-align:center;
-    margin-bottom:20px;
+    margin-bottom:15px;
 }
 
 .app-title{
-    font-size:28px;
+    font-size:24px;
     font-weight:700;
 }
 
 .app-sub{
-    font-size:14px;
+    font-size:13px;
     color:#8b949e;
-    margin-top:2px;
 }
 
 .tabs-container{
     display:flex;
     background:rgba(255,255,255,0.06);
-    padding:5px;
-    border-radius:14px;
-    margin-bottom:25px;
+    padding:4px;
+    border-radius:12px;
+    margin-bottom:20px;
 }
 
 .tab-btn{
     flex:1;
-    padding:11px;
+    padding:10px;
     border:0;
     background:transparent;
     color:#8b949e;
     font-size:14px;
     font-weight:600;
-    border-radius:10px;
+    border-radius:8px;
     cursor:pointer;
-    transition:0.2s;
 }
 
 .tab-btn.active{
-    background:rgba(255,255,255,0.15);
+    background:rgba(255,255,255,0.16);
     color:#fff;
 }
 
-/* Card */
+/* Card View */
 .content-card{
-    background:linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+    background:rgba(255,255,255,0.05);
     border:1px solid rgba(255,255,255,0.12);
-    border-radius:20px;
-    padding:30px 22px 20px;
-    backdrop-filter:blur(20px);
-    box-shadow:0 20px 40px rgba(0,0,0,0.5);
-    animation:cardAppear 0.35s ease;
-}
-
-@keyframes cardAppear{
-    from{ opacity:0; transform:scale(0.97); }
-    to{ opacity:1; transform:scale(1); }
+    border-radius:18px;
+    padding:25px 20px;
+    box-shadow:0 15px 35px rgba(0,0,0,0.5);
 }
 
 .card-badge{
-    display:inline-block;
     font-size:11px;
     font-weight:700;
-    padding:4px 10px;
-    border-radius:12px;
-    background:rgba(255, 117, 140, 0.15);
+    padding:3px 10px;
+    border-radius:10px;
+    background:rgba(255,117,140,0.15);
     color:#ff758c;
-    margin-bottom:15px;
+    display:inline-block;
+    margin-bottom:12px;
 }
 
 .card-body-text{
-    font-size:20px;
+    font-size:19px;
     line-height:1.7;
     text-align:center;
     margin:10px 0 20px;
-    min-height:80px;
+    min-height:75px;
     display:flex;
     align-items:center;
     justify-content:center;
     font-family:'Rozha One', serif;
-    color:#f1f2f6;
 }
 
 .card-author{
     text-align:right;
     color:#8b949e;
     font-size:13px;
-    border-bottom:1px solid rgba(255,255,255,0.06);
+    border-bottom:1px solid rgba(255,255,255,0.08);
     padding-bottom:12px;
 }
 
-/* Actions */
 .action-grid{
     display:grid;
     grid-template-columns:repeat(3, 1fr);
     gap:8px;
-    margin-top:16px;
+    margin-top:15px;
 }
 
 .btn-action{
     border:1px solid rgba(255,255,255,0.1);
-    background:rgba(255,255,255,0.05);
-    color:#ddd;
-    padding:10px 5px;
-    border-radius:12px;
+    background:rgba(255,255,255,0.06);
+    color:#fff;
+    padding:10px 4px;
+    border-radius:10px;
     cursor:pointer;
-    font-size:13px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-    transition:0.2s;
-}
-
-.btn-action:hover{
-    background:rgba(255,255,255,0.12);
+    font-size:12px;
 }
 
 .btn-action.liked{
     color:#ff4757;
-    background:rgba(255, 71, 87, 0.12);
+    background:rgba(255,71,87,0.15);
     border-color:#ff4757;
 }
 
-/* Rating */
 .rating-section{
     text-align:center;
-    margin-top:20px;
-    padding-top:12px;
-}
-
-.rating-title{
-    font-size:12px;
-    color:#8b949e;
+    margin-top:15px;
 }
 
 .star-group{
     display:flex;
     justify-content:center;
     gap:6px;
-    margin-top:6px;
+    margin-top:4px;
 }
 
 .star-icon{
     font-size:24px;
     color:#484f58;
     cursor:pointer;
-    transition:0.2s;
 }
 
 .star-icon.active{
     color:#ffa502;
-    text-shadow:0 0 10px rgba(255, 165, 2, 0.5);
 }
 
-/* Comments */
 .comment-container{
-    margin-top:18px;
+    margin-top:15px;
     display:none;
 }
 
 .comment-container.open{
     display:block;
-    animation:cardAppear 0.3s ease;
 }
 
 .comment-textarea{
     width:100%;
-    min-height:70px;
+    min-height:65px;
     background:rgba(0,0,0,0.3);
-    border:1px solid rgba(255,255,255,0.12);
-    border-radius:12px;
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:10px;
     padding:10px;
     color:#fff;
-    font-family:'Poppins', sans-serif;
     font-size:13px;
-    resize:none;
     outline:none;
 }
 
 .comment-submit{
     margin-top:6px;
-    padding:8px 16px;
+    padding:6px 14px;
     border:0;
-    border-radius:8px;
+    border-radius:6px;
     background:#70a1ff;
     color:#000;
     font-weight:600;
-    font-size:13px;
+    font-size:12px;
     cursor:pointer;
 }
 
 .comment-list{
-    margin-top:12px;
-    max-height:140px;
+    margin-top:10px;
+    max-height:120px;
     overflow-y:auto;
 }
 
 .single-comment{
-    background:rgba(255,255,255,0.04);
-    padding:8px 12px;
-    border-radius:8px;
+    background:rgba(255,255,255,0.05);
+    padding:6px 10px;
+    border-radius:6px;
     font-size:12px;
-    margin-bottom:6px;
+    margin-bottom:4px;
 }
 
-/* Navigation */
 .nav-controls{
     display:flex;
     justify-content:space-between;
-    margin-top:20px;
-    gap:12px;
+    margin-top:18px;
+    gap:10px;
 }
 
 .btn-ctrl{
     flex:1;
     padding:12px;
-    border-radius:12px;
+    border-radius:10px;
     border:1px solid rgba(255,255,255,0.12);
-    background:rgba(255,255,255,0.06);
+    background:rgba(255,255,255,0.08);
     color:#fff;
     font-size:14px;
     font-weight:600;
     cursor:pointer;
-}
-
-.btn-ctrl:hover{
-    background:rgba(255,255,255,0.12);
-}
-
-@media(max-width:650px){
-    .door-area{
-        flex-direction:column;
-        gap:16px;
-    }
-    .door-card{
-        height:180px;
-    }
-    .door-icon{
-        font-size:40px;
-        margin-bottom:6px;
-    }
-    .door-title{
-        font-size:20px;
-    }
-    .door-small{
-        font-size:12px;
-    }
-    .action-grid{
-        grid-template-columns:1fr;
-    }
 }
 </style>
 </head>
@@ -512,14 +447,14 @@ body{
 
 <canvas id="particle-canvas"></canvas>
 
-<!-- ================= HOME SCREEN ================= -->
+<!-- ================= HOME / DOORS ================= -->
 <section id="home">
     <div class="logo-container">
         <div class="logo">✨ DIL & HASI</div>
         <div class="subtitle">शायरी आणि मजेदार जोक्सचे जग</div>
     </div>
 
-    <div class="door-wrapper-title">दरवाजा निवडा आणि आत या 👇</div>
+    <div class="door-wrapper-title">दरवाजावर टच करा आणि आत या 👇</div>
 
     <div class="door-area">
         <!-- SHAYARI DOOR -->
@@ -574,6 +509,7 @@ body{
 </section>
 
 <script>
+/* 7 SHAYARI + 7 JOKES */
 const database = {
     shayari: [
         {
@@ -591,20 +527,48 @@ const database = {
         {
             text: "मुस्कुराने की आदत भी कितनी अजीब है,\nगम को छुपा लेती है और दुनिया समझती है कोई दर्द नहीं।",
             author: "— अनजान शायर"
+        },
+        {
+            text: "बहुत अंदर तक तबाह कर देते हैं,\nवो अश्क जो आँखों से कभी बह नहीं पाते।",
+            author: "— अकेला राही"
+        },
+        {
+            text: "रिश्ते कभी अपने आप नहीं टूटते,\nबस किसी का दिल भर जाता है या कोई बेहतर मिल जाता है।",
+            author: "— दर्द का सफर"
+        },
+        {
+            text: "हम तो समझे थे कि हम ही उनके अपने हैं,\nलेकिन वो तो हर किसी के साथ अपनेपन का नाटक करते थे।",
+            author: "— खामोश लफ्ज़"
         }
     ],
     jokes: [
         {
-            text: "मास्तर: संजू, काल शाळेत का आला नव्हतास?\nसंजू: सर, काल माझ्या स्वप्नात तुळजाभवानी आली होती!\nमास्तर: मग काय म्हणाली देवी?\nसंजू: म्हणाली, बाळ आज शाळेत जाऊ नको, आराम कर! 😂",
+            text: "मास्तर: संजू, काल शाळेत का आला नव्हतास?\nसंजू: सर, स्वप्नात देवी आली आणि म्हणाली आज आराम कर! 😂",
             author: "— संजू बाबा"
         },
         {
-            text: "पप्पू: यार, लग्नानंतर माणसात काय बदल होतो?\nगप्पू: काही नाही भावा, फक्त आधी स्वतःच्या मनाचं ऐकायचो,\nआता स्वतःच्या मनाला मारून बायकोचं ऐकावं लागतं! 🤣",
+            text: "पप्पू: लग्नानंतर माणसात काय बदल होतो?\nगप्पू: आधी स्वतःच्या मनाचं ऐकायचो, आता बायकोचं ऐकावं लागतं! 🤣",
             author: "— गप्पू मास्टर"
         },
         {
-            text: "डॉक्टर: वजन कमी करण्यासाठी रोज 5 किमी धावा.\nपप्पू: साहेब, 15 दिवसांत मी 75 किमी दूर पोहोचलोय,\nआता तिथून परत कसं येऊ? 🏃‍♂️😂",
+            text: "डॉक्टर: वजन कमी करण्यासाठी रोज 5 किमी धावत जा.\nपप्पू: 15 दिवसांत 75 किमी दूर पोहोचलोय, आता परत कसं येऊ? 🏃‍♂️😂",
             author: "— पप्पू द ग्रेट"
+        },
+        {
+            text: "मुलगा: बाबा, मला लग्न करायचं आहे!\nबाबा: आधी माफी माग.\nमुलगा: कशासाठी बाबा?\nबाबा: आधी माफी माग!\nमुलगा: सॉरी बाबा...\nबाबा: शाब्बास! आता तू लग्नासाठी तयार आहेस! 🤣",
+            author: "— देशी कॉमेडी"
+        },
+        {
+            text: "आई: फोन खाली ठेव आणि अभ्यास कर!\nपप्पू: फोन खाली ठेवला आई... आता अभ्यास कुठे शोधू? 😂",
+            author: "— पप्पू"
+        },
+        {
+            text: "दुकानदार: साहेब, हा साबण घ्या, चेहरा उजळेल.\nग्राहक: आणि जर नाही उजळला तर?\nदुकानदार: मग समजायचं की नशिबातच अंधार आहे! 😆",
+            author: "— जोक्स अड्डा"
+        },
+        {
+            text: "परीक्षेत प्रश्न आला: 'Explain your answer.'\nमी लिहिलं: माझं उत्तर मलाच समजलं नाही, मी तुम्हाला काय समजावू? 😜",
+            author: "— बॅकबेंचर"
         }
     ]
 };
@@ -616,37 +580,27 @@ function openDoorNow(selected){
     currentTab = selected;
     activeIndex = 0;
 
-    const clickedDoor = selected === 'shayari' 
+    const clickedCard = selected === 'shayari' 
         ? document.querySelector('.door-left') 
         : document.querySelector('.door-right');
-    
-    clickedDoor.classList.add('open');
+
+    clickedCard.classList.add('open');
 
     setTimeout(() => {
-        const home = document.getElementById("home");
-        home.classList.add("hidden");
-
-        setTimeout(() => {
-            home.style.display = "none";
-            const app = document.getElementById("app");
-            app.classList.add("show");
-            switchCategory(selected);
-        }, 500);
+        document.getElementById("home").classList.add("hidden");
+        const app = document.getElementById("app");
+        app.classList.add("show");
+        switchCategory(selected);
     }, 700);
 }
 
 function backToHome(){
     const app = document.getElementById("app");
     app.classList.remove("show");
-    app.style.display = "none";
 
     const home = document.getElementById("home");
-    home.style.display = "flex";
-    
-    setTimeout(() => {
-        home.classList.remove("hidden");
-        document.querySelectorAll(".door-card").forEach(d => d.classList.remove("open"));
-    }, 50);
+    home.classList.remove("hidden");
+    document.querySelectorAll(".door-card").forEach(d => d.classList.remove("open"));
 }
 
 function switchCategory(cat){
@@ -668,17 +622,15 @@ function switchCategory(cat){
 }
 
 function displayCard(){
-    const list = database[currentTab];
-    const item = list[activeIndex];
-    const storageKey = `${currentTab}_${activeIndex}`;
+    const item = database[currentTab][activeIndex];
+    const key = `${currentTab}_${activeIndex}`;
 
-    const likes = Number(localStorage.getItem(`${storageKey}_likes`) || 0);
-    const hasLiked = localStorage.getItem(`${storageKey}_liked`) === "true";
-    const rating = Number(localStorage.getItem(`${storageKey}_rating`) || 0);
-    const comments = JSON.parse(localStorage.getItem(`${storageKey}_comments`) || "[]");
+    const likes = Number(localStorage.getItem(`${key}_likes`) || 0);
+    const hasLiked = localStorage.getItem(`${key}_liked`) === "true";
+    const rating = Number(localStorage.getItem(`${key}_rating`) || 0);
+    const comments = JSON.parse(localStorage.getItem(`${key}_comments`) || "[]");
 
-    const container = document.getElementById("cardRenderer");
-    container.innerHTML = `
+    document.getElementById("cardRenderer").innerHTML = `
         <article class="content-card">
             <span class="card-badge">${currentTab === "shayari" ? "❤️ SHAYARI" : "⚡ JOKE"}</span>
             <div class="card-body-text">${cleanHTML(item.text).replace(/\n/g, "<br>")}</div>
@@ -686,30 +638,27 @@ function displayCard(){
 
             <div class="action-grid">
                 <button class="btn-action ${hasLiked ? 'liked' : ''}" onclick="togglePostLike()">
-                    <span>${hasLiked ? '❤️' : '🤍'}</span>
-                    <span>${likes} Likes</span>
+                    ${hasLiked ? '❤️' : '🤍'} ${likes}
                 </button>
                 <button class="btn-action" onclick="toggleCommentSection()">
-                    <span>💬</span>
-                    <span>${comments.length} Comments</span>
+                    💬 ${comments.length}
                 </button>
                 <button class="btn-action" onclick="sharePost()">
-                    <span>📤 Share</span>
+                    📤 Share
                 </button>
             </div>
 
             <div class="rating-section">
-                <div class="rating-title">रेट करा:</div>
                 <div class="star-group">
-                    ${[1, 2, 3, 4, 5].map(star => `
-                        <span class="star-icon ${star <= rating ? 'active' : ''}" onclick="giveRating(${star})">★</span>
+                    ${[1, 2, 3, 4, 5].map(s => `
+                        <span class="star-icon ${s <= rating ? 'active' : ''}" onclick="giveRating(${s})">★</span>
                     `).join('')}
                 </div>
             </div>
 
             <div id="commentBoxArea" class="comment-container">
-                <textarea id="commentInputArea" class="comment-textarea" placeholder="तुमची प्रतिक्रिया लिहा..."></textarea>
-                <button class="comment-submit" onclick="submitUserComment()">कमेंट पोस्ट करा</button>
+                <textarea id="commentInputArea" class="comment-textarea" placeholder="कमेंट लिहा..."></textarea>
+                <button class="comment-submit" onclick="submitUserComment()">पोस्ट करा</button>
                 <div class="comment-list">
                     ${comments.map(c => `<div class="single-comment">💬 ${cleanHTML(c)}</div>`).join('')}
                 </div>
@@ -736,14 +685,12 @@ function togglePostLike(){
 }
 
 function giveRating(score){
-    const key = `${currentTab}_${activeIndex}`;
-    localStorage.setItem(`${key}_rating`, score);
+    localStorage.setItem(`${currentTab}_${activeIndex}_rating`, score);
     displayCard();
 }
 
 function toggleCommentSection(){
-    const box = document.getElementById("commentBoxArea");
-    if(box) box.classList.toggle("open");
+    document.getElementById("commentBoxArea")?.classList.toggle("open");
 }
 
 function submitUserComment(){
@@ -762,34 +709,23 @@ function submitUserComment(){
     }, 10);
 }
 
-function moveSlide(direction){
+function moveSlide(dir){
     const len = database[currentTab].length;
-    activeIndex = (activeIndex + direction + len) % len;
+    activeIndex = (activeIndex + dir + len) % len;
     displayCard();
 }
 
 function sharePost(){
     const item = database[currentTab][activeIndex];
     if(navigator.share){
-        navigator.share({
-            title: "Dil & Hasi",
-            text: item.text
-        });
+        navigator.share({ title: "Dil & Hasi", text: item.text });
     } else {
-        navigator.clipboard.writeText(item.text).then(() => {
-            alert("मजकूर कॉपी झाला आहे! 📋");
-        });
+        navigator.clipboard.writeText(item.text).then(() => alert("कॉपी झाले! 📋"));
     }
 }
 
 function cleanHTML(str){
-    return str.replace(/[&<>"']/g, match => ({
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-    }[match]));
+    return str.replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[m]));
 }
 
 /* Background Canvas */
@@ -797,17 +733,42 @@ const canvas = document.getElementById('particle-canvas');
 const ctx = canvas.getContext('2d');
 let particles = [];
 
-function resizeCanvas(){
+function resize(){
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 }
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
+window.addEventListener('resize', resize);
+resize();
 
-class Particle {
+class P {
     constructor(){ this.reset(); }
     reset(){
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
         this.size = Math.random() * 2 + 0.5;
-        this.speedY = Math.random() * 0
+        this.speedY = Math.random() * 0.4 + 0.1;
+        this.op = Math.random() * 0.3 + 0.1;
+    }
+    update(){
+        this.y -= this.speedY;
+        if(this.y < 0) this.y = canvas.height;
+    }
+    draw(){
+        ctx.fillStyle = `rgba(255,255,255,${this.op})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+for(let i = 0; i < 25; i++) particles.push(new P());
+
+function loop(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>
