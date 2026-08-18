@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal Matrix | Live Hub</title>
+  <title>Portal Matrix | All-in-One</title>
   
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -11,579 +11,127 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+    body { background: radial-gradient(circle at 50% 20%, #1a103c, #06050b 80%); color: #fff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 15px; }
 
-    body {
-      background: radial-gradient(circle at 50% 20%, #1a103c, #06050b 80%);
-      color: #fff;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 15px;
-      overflow-x: hidden;
-    }
+    /* AUTH SCREEN */
+    #auth-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; width: 100%; max-width: 400px; text-align: center; gap: 20px; }
+    .app-title { font-size: 2.3rem; font-weight: 900; background: linear-gradient(45deg, #ff007f, #00f2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .auth-card { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); padding: 25px; border-radius: 24px; width: 100%; box-shadow: 0 15px 35px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 12px; }
+    .input-field { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); border-radius: 10px; color: #fff; }
+    .btn-login { background: linear-gradient(45deg, #4285F4, #34A853); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+    .btn-email-auth { background: linear-gradient(45deg, #ff007f, #7928ca); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+    .btn-guest { background: rgba(255, 255, 255, 0.08); color: #ddd; border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+    .auth-toggle { font-size: 0.8rem; color: #00f2fe; cursor: pointer; }
 
-    /* 1. Login / Guest Screen */
-    #auth-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 90vh;
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-      gap: 25px;
-    }
+    /* PORTAL SCREEN */
+    #portal-screen { display: none; width: 100%; max-width: 600px; flex-direction: column; gap: 20px; }
+    header { display: flex; justify-content: space-between; align-items: center; background: rgba(255, 255, 255, 0.05); padding: 12px 18px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.1); }
+    .door-grid { display: flex; flex-direction: column; gap: 15px; perspective: 1000px; }
+    .door-row { display: flex; gap: 15px; }
+    .door-wrapper { flex: 1; height: 130px; background: #080612; border-radius: 18px; position: relative; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
+    .door-panel { width: 100%; height: 100%; position: absolute; top:0; left:0; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: transform 0.6s; transform-origin: left; z-index: 2; color: #fff; font-weight: 700; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+    .door-wrapper.opening .door-panel { transform: rotateY(-115deg); }
+    .door-inside-bg { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, #ff007f, #1a102f); }
 
-    .app-title {
-      font-size: 2.3rem;
-      font-weight: 900;
-      background: linear-gradient(45deg, #ff007f, #00f2fe);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: 2px;
-      text-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
-    }
-
-    .auth-card {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(15px);
-      padding: 30px 20px;
-      border-radius: 24px;
-      width: 100%;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .btn-login {
-      background: linear-gradient(45deg, #4285F4, #34A853);
-      color: white;
-      border: none;
-      padding: 14px;
-      border-radius: 14px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
-    }
-
-    .btn-guest {
-      background: rgba(255, 255, 255, 0.08);
-      color: #ddd;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      padding: 14px;
-      border-radius: 14px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    /* 2. Main Portal Screen (3 Rows x 2 Doors) */
-    #portal-screen {
-      display: none;
-      width: 100%;
-      max-width: 600px;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 12px 18px;
-      border-radius: 16px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .btn-exit {
-      background: #ff3366;
-      border: none;
-      color: #fff;
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .door-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      perspective: 1000px;
-    }
-
-    .door-row {
-      display: flex;
-      gap: 15px;
-      width: 100%;
-    }
-
-    /* 3D Gate Cards */
-    .door-wrapper {
-      flex: 1;
-      height: 135px;
-      background: #080612;
-      border-radius: 18px;
-      position: relative;
-      perspective: 1200px;
-      cursor: pointer;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-      overflow: hidden;
-    }
-
-    .door-panel {
-      width: 100%;
-      height: 100%;
-      border-radius: 18px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      font-weight: 700;
-      font-size: 0.95rem;
-      color: #fff;
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      transform-origin: left;
-      z-index: 2;
-      position: absolute;
-      top: 0; left: 0;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
-    }
-
-    /* Door Background Styles */
-    .door-row:nth-child(1) .door-wrapper:nth-child(1) .door-panel { background: linear-gradient(135deg, #833ab4, #fd1d1d); }
-    .door-row:nth-child(1) .door-wrapper:nth-child(2) .door-panel { background: linear-gradient(135deg, #f12711, #f5af19); }
-    .door-row:nth-child(2) .door-wrapper:nth-child(1) .door-panel { background: linear-gradient(135deg, #00f2fe, #4facfe); color: #000; font-weight: 800; }
-    .door-row:nth-child(2) .door-wrapper:nth-child(2) .door-panel { background: linear-gradient(135deg, #1f4037, #99f2c8); color: #000; }
-    .door-row:nth-child(3) .door-wrapper:nth-child(1) .door-panel { background: linear-gradient(135deg, #11998e, #38ef7d); color: #000; }
-    .door-row:nth-child(3) .door-wrapper:nth-child(2) .door-panel { background: linear-gradient(135deg, #3a3d40, #181719); border: 1px dashed #666; }
-
-    .door-wrapper.opening .door-panel {
-      transform: rotateY(-115deg);
-    }
-
-    .door-inside-bg {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(circle, #ff007f, #1a102f);
-      font-weight: bold;
-      color: #fff;
-      font-size: 0.85rem;
-    }
-
-    /* 3. Global Chat Room View */
-    #chat-screen {
-      display: none;
-      width: 100%;
-      max-width: 600px;
-      flex-direction: column;
-      height: 92vh;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 24px;
-      backdrop-filter: blur(15px);
-      padding: 15px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-    }
-
-    .chat-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-bottom: 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .topic-bar {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding: 10px 0;
-      scrollbar-width: none;
-    }
-
-    .topic-chip {
-      background: rgba(255, 255, 255, 0.08);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      white-space: nowrap;
-      border: 1px solid transparent;
-      transition: 0.3s;
-    }
-
-    .topic-chip.active {
-      background: #00f2fe;
-      color: #000;
-      font-weight: bold;
-      box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
-    }
-
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding: 10px 5px;
-    }
-
-    .message-bubble {
-      max-width: 82%;
-      padding: 10px 14px;
-      border-radius: 16px;
-      font-size: 0.95rem;
-      line-height: 1.4;
-      word-break: break-word;
-    }
-
-    .msg-incoming {
-      align-self: flex-start;
-      background: rgba(255, 255, 255, 0.1);
-      border-bottom-left-radius: 4px;
-    }
-
-    .msg-outgoing {
-      align-self: flex-end;
-      background: linear-gradient(135deg, #00f2fe, #4facfe);
-      color: #000;
-      font-weight: 500;
-      border-bottom-right-radius: 4px;
-    }
-
-    .msg-sender {
-      font-size: 0.72rem;
-      color: #ff007f;
-      margin-bottom: 3px;
-      font-weight: bold;
-    }
-
-    .chat-input-area {
-      display: flex;
-      gap: 10px;
-      padding-top: 10px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .chat-input {
-      flex: 1;
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 12px;
-      padding: 12px 16px;
-      color: #fff;
-      outline: none;
-    }
-
-    .btn-send {
-      background: linear-gradient(45deg, #ff007f, #7928ca);
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 12px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    /* 4. Coming Soon Room View */
-    #room-screen {
-      display: none;
-      width: 100%;
-      max-width: 600px;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      min-height: 80vh;
-      justify-content: center;
-      text-align: center;
-    }
-
-    .room-box {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 24px;
-      padding: 40px 20px;
-      width: 100%;
-      backdrop-filter: blur(15px);
-    }
-
-    .btn-back {
-      background: linear-gradient(45deg, #00f2fe, #4facfe);
-      border: none;
-      color: #000;
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+    /* CHAT SCREEN */
+    #chat-screen { display: none; width: 100%; max-width: 600px; height: 90vh; background: rgba(255,255,255,0.05); border-radius: 20px; padding: 15px; }
+    .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+    .msg-incoming { align-self: flex-start; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; }
+    .msg-outgoing { align-self: flex-end; background: linear-gradient(135deg, #00f2fe, #4facfe); color: #000; padding: 10px; border-radius: 10px; }
+    .chat-input-area { display: flex; gap: 5px; }
+    .chat-input { flex: 1; padding: 10px; border-radius: 10px; border: none; }
+    .btn-send { padding: 10px; border-radius: 10px; border: none; background: #ff007f; color: #fff; }
   </style>
 </head>
 <body>
 
-  <!-- 1. Login Screen -->
+  <!-- 1. Auth Screen -->
   <div id="auth-screen">
     <div class="app-title">✨ PORTAL MATRIX</div>
     <div class="auth-card">
-      <p style="color: #aaa; font-size: 0.95rem;">प्रवेश करण्यासाठी पर्याय निवडा</p>
+      <input type="email" id="emailInput" class="input-field" placeholder="Email" />
+      <input type="password" id="passInput" class="input-field" placeholder="Password" />
+      <button class="btn-email-auth" id="emailActionBtn" onclick="handleEmailAuth()">📧 Email Login</button>
+      <div class="auth-toggle" onclick="toggleAuthMode()">नवीन युजर? Sign Up करा</div>
       <button class="btn-login" onclick="loginGoogle()">🚀 Google Login</button>
       <button class="btn-guest" onclick="enterGuest()">👤 Guest Entry</button>
     </div>
   </div>
 
-  <!-- 2. Portal Screen (3 Rows x 2 Doors) -->
+  <!-- 2. Main Portal -->
   <div id="portal-screen">
     <header>
-      <div id="user-display" style="color:#00f2fe; font-weight:700;">👤 Guest</div>
+      <div id="user-display">👤 User</div>
       <button class="btn-exit" onclick="logout()">बाहेर पडा</button>
     </header>
-
     <div class="door-grid">
-      <!-- Row 1 -->
+      <!-- Doors (1 to 6) -->
       <div class="door-row">
-        <div class="door-wrapper" onclick="openComingSoon(this, '💔 Sad Shayari दालन', 'येथे लवकरच दर्दभरी शायरी दालन सुरू होईल.')">
-          <div class="door-panel">💔<br>Sad Shayari</div>
-          <div class="door-inside-bg">उघडत आहे...</div>
-        </div>
-        <div class="door-wrapper" onclick="openComingSoon(this, '😂 Funny Jokes कट्टा', 'येथे लवकरच धम्माल जोक्स कट्टा सुरू होईल.')">
-          <div class="door-panel">😂<br>Funny Jokes</div>
-          <div class="door-inside-bg">उघडत आहे...</div>
-        </div>
+        <div class="door-wrapper" onclick="openRoom(this)"><div class="door-panel" style="background:#833ab4;">💔 Shayari</div><div class="door-inside-bg">⏳</div></div>
+        <div class="door-wrapper" onclick="openRoom(this)"><div class="door-panel" style="background:#f12711;">😂 Jokes</div><div class="door-inside-bg">⏳</div></div>
       </div>
-
-      <!-- Row 2 -->
       <div class="door-row">
-        <div class="door-wrapper" onclick="openLiveChat(this)">
-          <div class="door-panel">🌐<br>Global Live Chat</div>
-          <div class="door-inside-bg">लाईव्ह रूम...</div>
-        </div>
-        <div class="door-wrapper" onclick="openComingSoon(this, '🔒 Private Chat Room', 'End-to-End Encrypted प्रायव्हेट चॅटिंग दालन लवकरच सुरू होईल.')">
-          <div class="door-panel">🔒<br>Private Chat<br><small style="font-size:0.65rem;">End-to-End Encrypted</small></div>
-          <div class="door-inside-bg">उघडत आहे...</div>
-        </div>
+        <div class="door-wrapper" onclick="openLiveChat(this)"><div class="door-panel" style="background:#00f2fe; color:#000;">🌐 Live Chat</div><div class="door-inside-bg">💬</div></div>
+        <div class="door-wrapper" onclick="openRoom(this)"><div class="door-panel" style="background:#1f4037;">🔒 Private</div><div class="door-inside-bg">⏳</div></div>
       </div>
-
-      <!-- Row 3 -->
       <div class="door-row">
-        <div class="door-wrapper" onclick="openComingSoon(this, '📰 Cyber Tech News', 'हॅकिंग, सायबर सुरक्षा आणि ताज्या टेक घडामोडींचे वर्तमानपत्र लवकरच येईल.')">
-          <div class="door-panel">📰<br>Cyber Tech News<br><small style="font-size:0.65rem;">Hacking Newspaper</small></div>
-          <div class="door-inside-bg">उघडत आहे...</div>
-        </div>
-        <div class="door-wrapper" onclick="openComingSoon(this, '⏳ Coming Soon Secret Room', 'हे खास गुप्त दालन लवकरच उघडले जाईल!')">
-          <div class="door-panel">⏳<br>Coming Soon</div>
-          <div class="door-inside-bg">उघडत आहे...</div>
-        </div>
+        <div class="door-wrapper" onclick="openRoom(this)"><div class="door-panel" style="background:#11998e;">📰 News</div><div class="door-inside-bg">⏳</div></div>
+        <div class="door-wrapper" onclick="openRoom(this)"><div class="door-panel" style="background:#3a3d40;">⏳ Soon</div><div class="door-inside-bg">🔒</div></div>
       </div>
     </div>
   </div>
 
-  <!-- 3. Global Live Chat Room Screen -->
+  <!-- 3. Chat Room -->
   <div id="chat-screen">
-    <div class="chat-header">
-      <h3 style="color:#00f2fe; font-size:1.15rem;">🌐 Global Live Chat</h3>
-      <button class="btn-back" onclick="backToMatrix()">⬅️ बाहेर पडा</button>
-    </div>
-
-    <!-- Topics -->
-    <div class="topic-bar">
-      <div class="topic-chip active" onclick="switchTopic('general', this)">💬 General</div>
-      <div class="topic-chip" onclick="switchTopic('sad_talk', this)">💔 Sad Talk</div>
-      <div class="topic-chip" onclick="switchTopic('jokes_fun', this)">😂 Jokes & Masti</div>
-      <div class="topic-chip" onclick="switchTopic('tech_talk', this)">💻 Tech & Hacker</div>
-    </div>
-
-    <!-- Live Messages Feed -->
-    <div class="chat-messages" id="chatMessages">
-      <div style="text-align:center; color:#777;">मेसेज लोड होत आहेत...</div>
-    </div>
-
-    <!-- Input -->
+    <h3 style="margin-bottom:10px;">🌐 Live Chat</h3>
+    <div class="chat-messages" id="chatMessages"></div>
     <div class="chat-input-area">
-      <input type="text" id="chatInput" class="chat-input" placeholder="काहीतरी टाईप करा..." onkeypress="handleKeyPress(event)" />
-      <button class="btn-send" onclick="sendChatMessage()">पाठवा 🚀</button>
-    </div>
-  </div>
-
-  <!-- 4. Other Rooms (Coming Soon Screen) -->
-  <div id="room-screen">
-    <div class="room-box">
-      <h2 id="room-title" style="margin-bottom:12px; color:#00f2fe;">Room</h2>
-      <p id="room-desc" style="color:#bbb; font-size:1rem; margin-bottom:20px;">Details</p>
-      <h3 style="color:#ff007f; letter-spacing: 1px;">⏳ Coming Soon...</h3>
-      <button class="btn-back" style="margin-top:25px;" onclick="backToMatrix()">⬅️ मुख्य दालनात परत जा</button>
+      <input type="text" id="chatInput" class="chat-input" placeholder="Type..." />
+      <button class="btn-send" onclick="sendChatMessage()">Send</button>
     </div>
   </div>
 
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyObiMMjsay7Bv2nODc93Jhb908UtV6SPuo",
-      authDomain: "piiyush-patii.firebaseapp.com",
-      projectId: "piiyush-patii",
-      storageBucket: "piiyush-patii.firebasestorage.app",
-      messagingSenderId: "943004269137",
-      appId: "1:943004269137:web:13e65558654621d4855670",
-      measurementId: "G-QLKC2N0RWN"
-    };
-
+    const firebaseConfig = { apiKey: "AIzaSyObiMMjsay7Bv2nODc93Jhb908UtV6SPuo", authDomain: "piiyush-patii.firebaseapp.com", projectId: "piiyush-patii", storageBucket: "piiyush-patii.firebasestorage.app", messagingSenderId: "943004269137", appId: "1:943004269137:web:13e65558654621d4855670" };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    let currentUser = null;
-    let userName = "Guest User";
-    let activeTopic = "general";
-    let chatUnsubscribe = null;
+    let userName = "Guest";
+    let isSignUpMode = false;
 
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        currentUser = user;
-        userName = user.displayName || "Google User";
-        showPortal(userName);
-      }
+    // Google Login Logic
+    auth.getRedirectResult().then(res => { if(res.user) showPortal(res.user.displayName); });
+    function loginGoogle() { auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider()); }
+    
+    // Email Auth Logic
+    function toggleAuthMode() { isSignUpMode = !isSignUpMode; document.getElementById('emailActionBtn').innerText = isSignUpMode ? "Sign Up" : "Email Login"; }
+    function handleEmailAuth() {
+        const e = document.getElementById('emailInput').value, p = document.getElementById('passInput').value;
+        if(isSignUpMode) auth.createUserWithEmailAndPassword(e, p).then(() => alert("Created!")).catch(err => alert(err.message));
+        else auth.signInWithEmailAndPassword(e, p).catch(err => alert(err.message));
+    }
+
+    function enterGuest() { userName = prompt("Name:"); showPortal(userName); }
+    function showPortal(name) { document.getElementById('auth-screen').style.display='none'; document.getElementById('portal-screen').style.display='flex'; document.getElementById('user-display').innerText = name; }
+    function logout() { auth.signOut().then(() => location.reload()); }
+    
+    function openRoom(el) { el.classList.add('opening'); setTimeout(() => alert("Coming Soon!"), 600); setTimeout(() => el.classList.remove('opening'), 1000); }
+    function openLiveChat(el) { el.classList.add('opening'); setTimeout(() => { document.getElementById('portal-screen').style.display='none'; document.getElementById('chat-screen').style.display='flex'; }, 600); }
+    function backToMatrix() { document.getElementById('chat-screen').style.display='none'; document.getElementById('portal-screen').style.display='flex'; }
+
+    // Chat Logic
+    db.collection("world_chats").orderBy("createdAt", "asc").onSnapshot(snap => {
+        let html = "";
+        snap.forEach(doc => { const d = doc.data(); html += `<div class="${d.sender===userName?'msg-outgoing':'msg-incoming'}"><div class="msg-sender">${d.sender}</div>${d.text}</div>`; });
+        document.getElementById('chatMessages').innerHTML = html;
     });
 
-    function loginGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).catch(err => {
-        alert("Login Error: " + err.message);
-      });
-    }
-
-    function enterGuest() {
-      const guestName = prompt("तुमचे चॅट नाव टाका:", "Guest_" + Math.floor(Math.random()*1000));
-      userName = guestName ? guestName.trim() : "Guest User 👤";
-      showPortal(userName);
-    }
-
-    function showPortal(name) {
-      document.getElementById('auth-screen').style.display = 'none';
-      document.getElementById('portal-screen').style.display = 'flex';
-      document.getElementById('room-screen').style.display = 'none';
-      document.getElementById('chat-screen').style.display = 'none';
-      document.getElementById('user-display').innerText = "स्वागत आहे, " + name;
-    }
-
-    function logout() {
-      auth.signOut().then(() => {
-        currentUser = null;
-        userName = "Guest User";
-        document.getElementById('portal-screen').style.display = 'none';
-        document.getElementById('room-screen').style.display = 'none';
-        document.getElementById('chat-screen').style.display = 'none';
-        document.getElementById('auth-screen').style.display = 'flex';
-      });
-    }
-
-    // Door 3D Animations
-    function openComingSoon(el, title, desc) {
-      el.classList.add('opening');
-      setTimeout(() => {
-        document.getElementById('portal-screen').style.display = 'none';
-        document.getElementById('room-screen').style.display = 'flex';
-        document.getElementById('room-title').innerText = title;
-        document.getElementById('room-desc').innerText = desc;
-        el.classList.remove('opening');
-      }, 600);
-    }
-
-    function openLiveChat(el) {
-      el.classList.add('opening');
-      setTimeout(() => {
-        document.getElementById('portal-screen').style.display = 'none';
-        document.getElementById('chat-screen').style.display = 'flex';
-        el.classList.remove('opening');
-        loadLiveChat(activeTopic);
-      }, 600);
-    }
-
-    function backToMatrix() {
-      if (chatUnsubscribe) chatUnsubscribe();
-      document.getElementById('room-screen').style.display = 'none';
-      document.getElementById('chat-screen').style.display = 'none';
-      document.getElementById('portal-screen').style.display = 'flex';
-    }
-
-    // Live Realtime Chat Logic
-    function switchTopic(topic, el) {
-      activeTopic = topic;
-      document.querySelectorAll('.topic-chip').forEach(c => c.classList.remove('active'));
-      el.classList.add('active');
-      loadLiveChat(topic);
-    }
-
-    function loadLiveChat(topic) {
-      if (chatUnsubscribe) chatUnsubscribe();
-
-      const messagesContainer = document.getElementById('chatMessages');
-      messagesContainer.innerHTML = `<div style="text-align:center; color:#777; font-size:0.85rem;">लोड होत आहे...</div>`;
-
-      // Realtime listener
-      chatUnsubscribe = db.collection("world_chats")
-        .where("topic", "==", topic)
-        .onSnapshot(snapshot => {
-          messagesContainer.innerHTML = "";
-          if (snapshot.empty) {
-            messagesContainer.innerHTML = `<div style="text-align:center; color:#777; font-size:0.85rem; padding-top:20px;">या विषयात अजून काही चर्चा नाही. पहिली सुरवात तुम्ही करा! 💬</div>`;
-            return;
-          }
-          
-          let docs = [];
-          snapshot.forEach(doc => docs.push(doc.data()));
-          docs.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
-
-          docs.forEach(msg => {
-            const isMe = msg.sender === userName;
-            const bubble = document.createElement('div');
-            bubble.className = `message-bubble ${isMe ? 'msg-outgoing' : 'msg-incoming'}`;
-            bubble.innerHTML = `
-              ${!isMe ? `<div class="msg-sender">${msg.sender}</div>` : ''}
-              <div>${msg.text}</div>
-            `;
-            messagesContainer.appendChild(bubble);
-          });
-          messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        });
-    }
-
     function sendChatMessage() {
-      const input = document.getElementById('chatInput');
-      const text = input.value.trim();
-      if (!text) return;
-
-      db.collection("world_chats").add({
-        topic: activeTopic,
-        sender: userName,
-        text: text,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        input.value = "";
-      }).catch(err => {
-        alert("मेसेज एरर: " + err.message);
-      });
-    }
-
-    function handleKeyPress(e) {
-      if (e.key === 'Enter') sendChatMessage();
+        const text = document.getElementById('chatInput').value;
+        db.collection("world_chats").add({ text, sender: userName, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+        document.getElementById('chatInput').value = "";
     }
   </script>
 </body>
