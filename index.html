@@ -1,327 +1,797 @@
 <!DOCTYPE html>
-<html lang="mr">
-
+<html lang="hi">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>शायरी आणि जोक्स | Heart & Laughs</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Rozha+One&family=Yatra+One&display=swap" rel="stylesheet">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    user-select:none;
+}
 
-    <meta name="theme-color" content="#08070d">
+body{
+    min-height:100vh;
+    font-family:'Poppins', sans-serif;
+    background:radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+    color:#fff;
+    overflow-x:hidden;
+}
 
-    <title>Shayari & Jokes</title>
+/* ================= BACKGROUND PARTICLES ================= */
+#particle-canvas{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    z-index:0;
+    pointer-events:none;
+}
 
-    <link rel="stylesheet" href="style.css">
+/* ================= HOME SCREEN ================= */
+#home{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    position:relative;
+    z-index:1;
+    transition:all 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.logo-container{
+    position:absolute;
+    top:30px;
+    text-align:center;
+}
+
+.logo{
+    font-size:26px;
+    font-weight:700;
+    letter-spacing:3px;
+    background:linear-gradient(45deg, #ff758c, #ff7eb3, #70a1ff);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    text-shadow:0 10px 20px rgba(255,117,140,0.2);
+}
+
+.subtitle{
+    font-size:15px;
+    color:#a0a5b5;
+    margin-top:5px;
+    letter-spacing:1px;
+}
+
+.door-wrapper-title{
+    margin-top:70px;
+    margin-bottom:30px;
+    font-size:18px;
+    color:#e0e0e0;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    font-weight:600;
+    text-shadow:0 0 10px rgba(255,255,255,0.3);
+}
+
+/* 3D Door Area */
+.door-area{
+    width:min(860px, 94vw);
+    height:420px;
+    display:flex;
+    gap:24px;
+    perspective:1600px;
+}
+
+.door-card{
+    flex:1;
+    height:100%;
+    position:relative;
+    cursor:pointer;
+    border-radius:24px;
+    background:rgba(255, 255, 255, 0.03);
+    border:1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:0 25px 50px -12px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255,255,255,0.2);
+    transform-style:preserve-3d;
+    transition:transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.door-card:hover{
+    transform:translateY(-10px) scale(1.02);
+    box-shadow:0 35px 60px -10px rgba(0,0,0,0.9), 0 0 30px rgba(112, 161, 255, 0.2);
+}
+
+/* Background preview inside the door */
+.door-bg{
+    position:absolute;
+    inset:0;
+    border-radius:24px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    text-align:center;
+    z-index:1;
+}
+
+.door-left .door-bg{
+    background:radial-gradient(circle at center, #2e122b 0%, #110715 100%);
+}
+
+.door-right .door-bg{
+    background:radial-gradient(circle at center, #11283b 0%, #061019 100%);
+}
+
+.door-icon{
+    font-size:70px;
+    margin-bottom:15px;
+    filter:drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+    transition:transform 0.3s;
+}
+
+.door-card:hover .door-icon{
+    transform:scale(1.15) rotate(5deg);
+}
+
+.door-title{
+    font-size:28px;
+    font-weight:700;
+    margin-bottom:6px;
+    letter-spacing:1px;
+}
+
+.door-small{
+    font-size:14px;
+    color:#aaa;
+}
+
+/* Animated 3D Door Panels */
+.door-leaf{
+    position:absolute;
+    top:0;
+    width:50%;
+    height:100%;
+    z-index:5;
+    background:linear-gradient(135deg, rgba(255,255,255,0.08), rgba(0,0,0,0.6)),
+               radial-gradient(circle at top left, rgba(255,255,255,0.15), transparent);
+    backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,0.15);
+    transition:transform 1.2s cubic-bezier(0.7, 0, 0.2, 1);
+    box-shadow:inset 0 0 20px rgba(0,0,0,0.6);
+}
+
+.door-leaf.left{
+    left:0;
+    border-radius:24px 0 0 24px;
+    transform-origin:left center;
+}
+
+.door-leaf.right{
+    right:0;
+    border-radius:0 24px 24px 0;
+    transform-origin:right center;
+}
+
+.door-card.open .door-leaf.left{
+    transform:rotateY(-120deg);
+}
+
+.door-card.open .door-leaf.right{
+    transform:rotateY(120deg);
+}
+
+.door-handle{
+    width:12px;
+    height:36px;
+    background:linear-gradient(180deg, #ffdf79, #c3922e);
+    border-radius:6px;
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+    box-shadow:0 2px 10px rgba(0,0,0,0.5);
+}
+
+.door-leaf.left .door-handle{ right:12px; }
+.door-leaf.right .door-handle{ left:12px; }
+
+#home.hidden{
+    opacity:0;
+    transform:scale(0.92);
+    pointer-events:none;
+}
+
+/* ================= MAIN APP ================= */
+#app{
+    display:none;
+    min-height:100vh;
+    position:relative;
+    z-index:2;
+    padding-bottom:50px;
+}
+
+#app.show{
+    display:block;
+    animation:appFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes appFadeIn{
+    from{ opacity:0; transform:translateY(40px); }
+    to{ opacity:1; transform:translateY(0); }
+}
+
+.navbar{
+    height:70px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 30px;
+    background:rgba(13, 17, 23, 0.7);
+    backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    position:sticky;
+    top:0;
+    z-index:100;
+}
+
+.nav-brand{
+    font-size:20px;
+    font-weight:700;
+    background:linear-gradient(45deg, #ff7eb3, #70a1ff);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.back-btn{
+    border:1px solid rgba(255,255,255,0.15);
+    background:rgba(255,255,255,0.05);
+    color:#fff;
+    padding:8px 18px;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:14px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    transition:all 0.3s;
+}
+
+.back-btn:hover{
+    background:rgba(255,255,255,0.15);
+    transform:translateX(-3px);
+}
+
+.container{
+    width:min(680px, 92vw);
+    margin:35px auto 0;
+}
+
+/* Header & Tabs */
+.app-header{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.app-title{
+    font-size:34px;
+    font-weight:700;
+    letter-spacing:1px;
+}
+
+.app-sub{
+    font-size:15px;
+    color:#8b949e;
+    margin-top:4px;
+}
+
+.tabs-container{
+    display:flex;
+    background:rgba(255,255,255,0.05);
+    padding:5px;
+    border-radius:16px;
+    margin-bottom:30px;
+    border:1px solid rgba(255,255,255,0.08);
+}
+
+.tab-btn{
+    flex:1;
+    padding:12px;
+    border:0;
+    background:transparent;
+    color:#8b949e;
+    font-size:15px;
+    font-weight:600;
+    border-radius:12px;
+    cursor:pointer;
+    transition:all 0.3s;
+}
+
+.tab-btn.active{
+    background:linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+    color:#fff;
+    box-shadow:0 4px 15px rgba(0,0,0,0.3);
+    border:1px solid rgba(255,255,255,0.1);
+}
+
+/* Content Card */
+.content-card{
+    background:linear-gradient(145deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:24px;
+    padding:35px 30px 25px;
+    backdrop-filter:blur(20px);
+    box-shadow:0 30px 60px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.15);
+    animation:cardAppear 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position:relative;
+}
+
+@keyframes cardAppear{
+    from{ opacity:0; transform:translateY(15px) scale(0.98); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
+}
+
+.card-badge{
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    padding:4px 12px;
+    border-radius:20px;
+    background:rgba(255,255,255,0.1);
+    color:#ff758c;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    margin-bottom:20px;
+    border:1px solid rgba(255,117,140,0.2);
+}
+
+.card-body-text{
+    font-size:22px;
+    line-height:1.7;
+    text-align:center;
+    margin:10px 0 25px;
+    min-height:90px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Rozha One', serif;
+    font-weight:400;
+    color:#f1f2f6;
+    text-shadow:0 2px 10px rgba(0,0,0,0.4);
+}
+
+.card-author{
+    text-align:right;
+    color:#8b949e;
+    font-size:14px;
+    font-style:italic;
+    border-bottom:1px solid rgba(255,255,255,0.06);
+    padding-bottom:15px;
+}
+
+/* Action Buttons */
+.action-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:10px;
+    margin-top:20px;
+}
+
+.btn-action{
+    border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.04);
+    color:#c9d1d9;
+    padding:12px;
+    border-radius:14px;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:500;
+    transition:all 0.2s ease;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+
+.btn-action:hover{
+    background:rgba(255,255,255,0.12);
+    transform:translateY(-2px);
+}
+
+.btn-action.liked{
+    color:#ff4757;
+    background:rgba(255, 71, 87, 0.1);
+    border-color:rgba(255, 71, 87, 0.3);
+}
+
+.btn-action.liked span.heart-icon{
+    animation:heartBeat 0.4s ease;
+}
+
+@keyframes heartBeat{
+    0%{ transform:scale(1); }
+    50%{ transform:scale(1.4); }
+    100%{ transform:scale(1); }
+}
+
+/* Rating */
+.rating-section{
+    text-align:center;
+    margin-top:25px;
+    padding-top:15px;
+}
+
+.rating-title{
+    font-size:13px;
+    color:#8b949e;
+    letter-spacing:0.5px;
+}
+
+.star-group{
+    display:flex;
+    justify-content:center;
+    gap:8px;
+    margin-top:8px;
+}
+
+.star-icon{
+    font-size:26px;
+    color:#484f58;
+    cursor:pointer;
+    transition:transform 0.2s, color 0.2s;
+}
+
+.star-icon:hover{
+    transform:scale(1.2);
+}
+
+.star-icon.active{
+    color:#ffa502;
+    text-shadow:0 0 12px rgba(255, 165, 2, 0.4);
+}
+
+/* Comments Box */
+.comment-container{
+    margin-top:20px;
+    display:none;
+    animation:cardAppear 0.3s ease;
+}
+
+.comment-container.open{
+    display:block;
+}
+
+.comment-textarea{
+    width:100%;
+    min-height:75px;
+    background:rgba(0,0,0,0.3);
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:14px;
+    padding:12px;
+    color:#fff;
+    font-family:'Poppins', sans-serif;
+    font-size:14px;
+    resize:none;
+    outline:none;
+}
+
+.comment-textarea:focus{
+    border-color:#70a1ff;
+}
+
+.comment-submit{
+    margin-top:8px;
+    padding:8px 20px;
+    border:0;
+    border-radius:10px;
+    background:linear-gradient(45deg, #70a1ff, #1e90ff);
+    color:#fff;
+    font-weight:600;
+    font-size:13px;
+    cursor:pointer;
+    transition:opacity 0.2s;
+}
+
+.comment-submit:hover{
+    opacity:0.9;
+}
+
+.comment-list{
+    margin-top:15px;
+    max-height:160px;
+    overflow-y:auto;
+}
+
+.single-comment{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    padding:10px 14px;
+    border-radius:10px;
+    font-size:13px;
+    color:#c9d1d9;
+    margin-bottom:6px;
+}
+
+/* Navigation Buttons */
+.nav-controls{
+    display:flex;
+    justify-content:space-between;
+    margin-top:25px;
+    gap:15px;
+}
+
+.btn-ctrl{
+    flex:1;
+    padding:14px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,0.1);
+    background:rgba(255,255,255,0.04);
+    color:#fff;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    transition:all 0.3s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+
+.btn-ctrl:hover{
+    background:rgba(255,255,255,0.1);
+    transform:translateY(-2px);
+}
+
+@media(max-width:650px){
+    .door-area{
+        height:380px;
+        flex-direction:column;
+        gap:15px;
+    }
+    .door-card{ min-height:180px; }
+    .door-icon{ font-size:45px; margin-bottom:5px; }
+    .door-title{ font-size:22px; }
+    .card-body-text{ font-size:18px; }
+    .action-grid{ grid-template-columns:1fr; }
+}
+</style>
 </head>
-
 
 <body>
 
-    <!-- =========================
-         HOME / DOORS SCREEN
-    ========================== -->
-
-    <section id="doors">
-
-        <div class="logo">
-            ✨ SHAYARI • JOKES
-        </div>
-
-        <p class="sub">
-            एक दरवाजा निवड आणि आत ये 😄
-        </p>
-
-
-        <div class="doorWrap">
-
-
-            <!-- =====================
-                 SAD SHAYARI DOOR
-            ====================== -->
-
-            <button
-                class="doorCard"
-                data-type="shayari"
-            >
-
-                <div class="doorInner">
-
-                    <div class="emoji">
-                        💔
-                    </div>
-
-                    <h2>
-                        Sad Shayari
-                    </h2>
-
-                    <span>
-                        मनातील शब्द
-                    </span>
-
-                </div>
-
-
-                <!-- Left door panel -->
-
-                <div class="doorPanel left">
-                </div>
-
-
-                <!-- Right door panel -->
-
-                <div class="doorPanel right">
-                </div>
-
-            </button>
-
-
-
-            <!-- =====================
-                 JOKES DOOR
-            ====================== -->
-
-            <button
-                class="doorCard"
-                data-type="joke"
-            >
-
-                <div class="doorInner">
-
-                    <div class="emoji">
-                        😂
-                    </div>
-
-                    <h2>
-                        Jokes
-                    </h2>
-
-                    <span>
-                        थोडं हसूया
-                    </span>
-
-                </div>
-
-
-                <!-- Left door panel -->
-
-                <div class="doorPanel left">
-                </div>
-
-
-                <!-- Right door panel -->
-
-                <div class="doorPanel right">
-                </div>
-
-            </button>
-
-        </div>
-
-
-        <!-- Guest button -->
-
-        <button
-            id="guestBtn"
-            class="ghostBtn"
-        >
-            👤 Continue as Guest
-        </button>
-
-
-        <!-- Login button -->
-
-        <button
-            id="loginTop"
-            class="linkBtn"
-        >
-            Login / Register
-        </button>
-
-    </section>
-
-
-
-    <!-- =========================
-         MAIN WEBSITE
-    ========================== -->
-
-    <section
-        id="app"
-        class="hidden"
-    >
-
-
-        <!-- =====================
-             NAVBAR
-        ====================== -->
-
-        <header class="nav">
-
-            <b>
-                ✨ Shayari & Jokes
-            </b>
-
-
-            <div>
-
-                <span id="userBadge">
-                </span>
-
-
-                <button
-                    id="authBtn"
-                    class="smallBtn"
-                >
-                    Login
-                </button>
-
-
-                <button
-                    id="logoutBtn"
-                    class="smallBtn hidden"
-                >
-                    Logout
-                </button>
-
-
-                <button
-                    id="homeBtn"
-                    class="smallBtn"
-                >
-                    Home
-                </button>
-
-            </div>
-
-        </header>
-
-
-
-        <!-- =====================
-             CONTENT
-        ====================== -->
-
-        <main class="container">
-
-
-            <div class="topRow">
-
-                <div>
-
-                    <h1 id="title">
-                        💔 Sad Shayari
-                    </h1>
-
-                    <p id="subtitle">
-                        Feel every word ❤️
-                    </p>
-
-                </div>
-
-
-                <!-- Create post -->
-
-                <button
-                    id="newPostBtn"
-                    class="primaryBtn"
-                >
-                    ＋ My Post
-                </button>
-
-            </div>
-
-
-
-            <!-- =====================
-                 TABS
-            ====================== -->
-
-            <div class="tabs">
-
-                <button
-                    class="tab active"
-                    data-type="shayari"
-                >
-                    💔 Shayari
-                </button>
-
-
-                <button
-                    class="tab"
-                    data-type="joke"
-                >
-                    😂 Jokes
-                </button>
-
-            </div>
-
-
-
-            <!-- =====================
-                 POSTS
-            ====================== -->
-
-            <div id="feed">
-
-                <!-- JavaScript येथे posts दाखवेल -->
-
-            </div>
-
-        </main>
-
-    </section>
-
-
-
-    <!-- =========================
-         LOGIN / REGISTER MODAL
-    ========================== -->
-
-    <div
-        id="modal"
-        class="modal hidden"
-    >
-
-        <div class="modalBox">
-
-
-            <!-- Close -->
-
-            <button
-                class="close"
-                id="closeModal"
-            >
-                ×
-            </button>
-
-
-            <!-- Login/Register content
-                 JavaScript येथे टाकेल -->
-
-            <div id="modalContent">
-            </div>
-
-        </div>
-
+<canvas id="particle-canvas"></canvas>
+
+<!-- ================= HOME SCREEN ================= -->
+<section id="home">
+    <div class="logo-container">
+        <div class="logo">✨ DIL & HASI</div>
+        <div class="subtitle">शायरी आणि मजेदार जोक्सचे जग</div>
     </div>
 
+    <div class="door-wrapper-title">एक दरवाजा निवडा आणि आत या</div>
 
+    <div class="door-area">
+        <!-- SHAYARI DOOR -->
+        <div class="door-card door-left" onclick="openGate('shayari')">
+            <div class="door-bg">
+                <div class="door-icon">💔</div>
+                <div class="door-title">Sad Shayari</div>
+                <div class="door-small">दिलाला स्पर्श करणारे शब्द</div>
+            </div>
+            <div class="door-leaf left"><div class="door-handle"></div></div>
+            <div class="door-leaf right"></div>
+        </div>
 
-    <!-- Toast message -->
-
-    <div id="toast">
+        <!-- JOKES DOOR -->
+        <div class="door-card door-right" onclick="openGate('jokes')">
+            <div class="door-bg">
+                <div class="door-icon">😂</div>
+                <div class="door-title">Funny Jokes</div>
+                <div class="door-small">हसून लोटपोट व्हा</div>
+            </div>
+            <div class="door-leaf left"></div>
+            <div class="door-leaf right"><div class="door-handle"></div></div>
+        </div>
     </div>
+</section>
 
+<!-- ================= APP INTERFACE ================= -->
+<section id="app">
+    <nav class="navbar">
+        <div class="nav-brand">✨ Dil & Hasi</div>
+        <button class="back-btn" onclick="backToHome()">
+            <span>🏠</span> मागे जा
+        </button>
+    </nav>
 
+    <main class="container">
+        <div class="app-header">
+            <h1 class="app-title" id="appHeaderTitle">Sad Shayari</h1>
+            <p class="app-sub" id="appHeaderSubtitle">Feel every word ❤️</p>
+        </div>
 
-    <!-- =========================
-         JAVASCRIPT
-    ========================== -->
+        <div class="tabs-container">
+            <button class="tab-btn active" id="tabShayari" onclick="switchCategory('shayari')">💔 शायरी</button>
+            <button class="tab-btn" id="tabJokes" onclick="switchCategory('jokes')">😂 जोक्स</button>
+        </div>
 
-    <script src="app.js"></script>
+        <div id="cardRenderer"></div>
 
-</body>
+        <div class="nav-controls">
+            <button class="btn-ctrl" onclick="moveSlide(-1)">
+                <span>←</span> मागे
+            </button>
+            <button class="btn-ctrl" onclick="moveSlide(1)">
+                पुढे <span>→</span>
+            </button>
+        </div>
+    </main>
+</section>
 
-</html>
+<script>
+/* DATA REPOSITORY */
+const database = {
+    shayari: [
+        {
+            text: "कभी कभी किसी की खामोशी भी\nसब कुछ बयां कर देती है।",
+            author: "— खामोश दिल"
+        },
+        {
+            text: "हमने तो समझा था कि हम ही खास हैं,\nपर वक्त ने बता दिया कि हम सिर्फ एक वक्त का सहारा थे।",
+            author: "— तन्हा मुसाफिर"
+        },
+        {
+            text: "छोड़ दिया हमने भी लोगों को बेवजह परेशान करना,\nजब कोई अपना समझेगा तो खुद याद कर लेगा।",
+            author: "— टूटा साया"
+        },
+        {
+            text: "मुस्कुराने की आदत भी कितनी अजीब है,\nगम को छुपा लेती है और दुनिया समझती है कोई दर्द नहीं।",
+            author: "— अनजान शायर"
+        }
+    ],
+    jokes: [
+        {
+            text: "मास्तर: संजू, काल शाळेत का आला नव्हतास?\nसंजू: सर, काल माझ्या स्वप्नात तुळजाभवानी आली होती!\nमास्तर: मग काय म्हणाली देवी?\nसंजू: म्हणाली, बाळ आज शाळेत जाऊ नको, आराम कर! 😂",
+            author: "— संजू बाबा"
+        },
+        {
+            text: "पप्पू: यार, लग्नानंतर माणसात काय बदल होतो?\nगप्पू: काही नाही भावा, फक्त आधी स्वतःच्या मनाचं ऐकायचो,\nआता स्वतःच्या मनाला मारून बायकोचं ऐकावं लागतं! 🤣",
+            author: "— गप्पू मास्टर"
+        },
+        {
+            text: "डॉक्टर: वजन कमी करण्यासाठी रोज 5 किमी धावा.\nपप्पू: साहेब, 15 दिवसांत मी 75 किमी दूर पोहोचलोय,\nआता तिथून परत कसं येऊ? 🏃‍♂️😂",
+            author: "— पप्पू द ग्रेट"
+        }
+    ]
+};
+
+let currentTab = "shayari";
+let activeIndex = 0;
+
+/* DOOR ANIMATION & TRANSITION */
+function openGate(selected){
+    currentTab = selected;
+    activeIndex = 0;
+
+    const doors = document.querySelectorAll(".door-card");
+    doors.forEach(d => d.classList.add("open"));
+
+    setTimeout(() => {
+        const home = document.getElementById("home");
+        home.classList.add("hidden");
+
+        setTimeout(() => {
+            home.style.display = "none";
+            const app = document.getElementById("app");
+            app.classList.add("show");
+            switchCategory(selected);
+        }, 600);
+    }, 850);
+}
+
+function backToHome(){
+    const app = document.getElementById("app");
+    app.classList.remove("show");
+    app.style.display = "none";
+
+    const home = document.getElementById("home");
+    home.style.display = "flex";
+    
+    setTimeout(() => {
+        home.classList.remove("hidden");
+        document.querySelectorAll(".door-card").forEach(d => d.classList.remove("open"));
+    }, 50);
+}
+
+/* TAB SWITCHING */
+function switchCategory(cat){
+    currentTab = cat;
+    activeIndex = 0;
+
+    document.getElementById("tabShayari").classList.toggle("active", cat === "shayari");
+    document.getElementById("tabJokes").classList.toggle("active", cat === "jokes");
+
+    if(cat === "shayari"){
+        document.getElementById("appHeaderTitle").innerText = "💔 दर्द भरी शायरी";
+        document.getElementById("appHeaderSubtitle").innerText = "शब्दांमधील भावना अनुभवा...";
+    } else {
+        document.getElementById("appHeaderTitle").innerText = "😂 धम्माल जोक्स";
+        document.getElementById("appHeaderSubtitle").innerText = "हसा आणि तणाव दूर करा!";
+    }
+
+    displayCard();
+}
+
+/* RENDER CONTENT CARD */
+function displayCard(){
+    const list = database[currentTab];
+    const item = list[activeIndex];
+    const storageKey = `${currentTab}_${activeIndex}`;
+
+    const likes = Number(localStorage.getItem(`${storageKey}_likes`) || 0);
+    const hasLiked = localStorage.getItem(`${storageKey}_liked`) === "true";
+    const rating = Number(localStorage.getItem(`${storageKey}_rating`) || 0);
+    const comments = JSON.parse(localStorage.getItem(`${storageKey}_comments`) || "[]");
+
+    const container = document.getElementById("cardRenderer");
+    container.innerHTML = `
+        <article class="content-card">
+            <span class="card-badge">${currentTab === "shayari" ? "❤️ SHAYARI" : "⚡ JOKE"}</span>
+            <div class="card-body-text">${cleanHTML(item.text).replace(/\n/g, "<br>")}</div>
+            <div class="card-author">${cleanHTML(item.author)}</div>
+
+            <div class="action-grid">
+                <button class="btn-action ${hasLiked ? 'liked' : ''}" onclick="togglePostLike()">
+                    <span class="heart-icon">${hasLiked ? '❤️' : '🤍'}</span>
+                    <span>${likes} Likes</span>
+                </button>
+                <button class="btn-action" onclick="toggleCommentSection()">
+                    <span>💬</span>
+                    <span>${comments.length} Comments</span>
+                </button>
+                <button class="btn-action" onclick="sharePost()">
+                    <span>📤</span>
+                    <span>Share</span>
+                </button>
+            </div>
+
+            <div class="rating-section">
+                <div class="rating-title">तुम्हाला हे कसे वाटले? रेट करा:</div>
+                <div class="star-group">
+                    ${[1, 2, 3, 4, 5].map(star => `
+                        <span class="star-icon ${star <= rating ? 'active' : ''}" onclick="giveRating(${star})">★</span>
+                    `).join('')}
+                </div>
+            </div>
+
+            <div id="commentBoxArea" class="comment-container">
+                <textarea id="commentInputArea" class="comment-textarea" placeholder="तुमची प्रतिक्रिया लिहा..."></textarea>
+                <button class="comment-submit" onclick="submitUserComment()">कमेंट पोस्ट करा</button>
+                <div class="comment-list">
+                    ${comments.map(c => `<div class="single-comment">💬 ${cleanHTML(c)}</div>`).join('')}
+                </div>
+            </div>
+        </article>
+    `;
+}
+
+/* INTERACTIONS */
+function togglePostLike(){
+    const key = `${currentTab}_${activeIndex}`;
+    let likes = Number(localStorage.getItem(`${key}_likes`) || 0);
+    let hasLiked = localStorage.getItem(`${key}_liked`) === "true";
+
+    if(hasLiked){
+        likes = Math.max(0, likes - 1);
+        localStorage.setItem(`${key}_liked`, "false");
+    } else {
+        likes++;
+        localStorage.setItem(`${key}_liked`, "true");
+    }
+
+    localStorage.setItem(`${key}_likes`, likes
