@@ -1,14 +1,13 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="mr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dil & Hasi | शायरी आणि जोक्स</title>
+  <title>Portal Matrix | 6 Doors</title>
   
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 
   <style>
     * {
@@ -19,7 +18,7 @@
     }
 
     body {
-      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      background: radial-gradient(circle at top, #1a102f, #080710);
       color: #fff;
       min-height: 100vh;
       display: flex;
@@ -29,246 +28,274 @@
       overflow-x: hidden;
     }
 
-    /* Header & Auth */
-    header {
-      width: 100%;
-      max-width: 600px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 10px 15px;
-      border-radius: 15px;
-      backdrop-filter: blur(10px);
-    }
-
-    .logo {
-      font-size: 1.3rem;
-      font-weight: bold;
-      background: linear-gradient(45deg, #ff416c, #ff4b2b);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .auth-btn {
-      background: linear-gradient(45deg, #4285F4, #34A853);
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 0.85rem;
-      transition: 0.3s;
-    }
-
-    /* 3D Doors Section */
-    .doors-container {
-      display: flex;
-      gap: 15px;
-      width: 100%;
-      max-width: 600px;
-      margin-bottom: 25px;
-      perspective: 1000px;
-    }
-
-    .door-wrapper {
-      flex: 1;
-      height: 120px;
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 15px;
-      position: relative;
-      cursor: pointer;
-      overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .door {
-      width: 100%;
-      height: 100%;
+    /* 1. Welcome / Auth Screen */
+    #auth-screen {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
-      font-size: 1.1rem;
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      transform-origin: left;
+      min-height: 85vh;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      gap: 20px;
     }
 
-    .door.shayari { background: linear-gradient(135deg, #833ab4, #fd1d1d); }
-    .door.jokes { background: linear-gradient(135deg, #f12711, #f5af19); }
+    .app-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(45deg, #ff007f, #00f2fe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+    }
 
-    .door-wrapper.active .door {
-      transform: rotateY(-110deg);
+    .auth-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(15px);
+      padding: 30px 20px;
+      border-radius: 20px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .btn-login {
+      background: linear-gradient(45deg, #4285F4, #34A853);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3);
+      transition: transform 0.2s;
+    }
+
+    .btn-guest {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ddd;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-login:active, .btn-guest:active {
+      transform: scale(0.97);
+    }
+
+    /* 2. Main Portal Screen */
+    #portal-screen {
+      display: none;
+      width: 100%;
+      max-width: 650px;
+      flex-direction: column;
+      gap: 20px;
+      padding-bottom: 30px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 12px 18px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .user-tag {
+      font-size: 0.95rem;
+      color: #00f2fe;
+      font-weight: 600;
+    }
+
+    .btn-exit {
+      background: #ff3366;
+      border: none;
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* Grid Layout: 3 Rows x 2 Doors */
+    .door-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .door-row {
+      display: flex;
+      gap: 15px;
+      width: 100%;
+    }
+
+    /* 3D Door Perspective */
+    .door-wrapper {
+      flex: 1;
+      height: 135px;
+      background: #0d0b18;
+      border-radius: 16px;
+      position: relative;
+      perspective: 1200px;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .door-panel {
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #fff;
+      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: left;
+      z-index: 2;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.3);
+    }
+
+    /* Row Styles */
+    .door-row:nth-child(1) .door-wrapper:nth-child(1) .door-panel { background: linear-gradient(135deg, #833ab4, #fd1d1d); }
+    .door-row:nth-child(1) .door-wrapper:nth-child(2) .door-panel { background: linear-gradient(135deg, #f12711, #f5af19); }
+
+    .door-row:nth-child(2) .door-wrapper:nth-child(1) .door-panel { background: linear-gradient(135deg, #00b09b, #96c93d); }
+    .door-row:nth-child(2) .door-wrapper:nth-child(2) .door-panel { background: linear-gradient(135deg, #1f4037, #99f2c8); color: #000; }
+
+    .door-row:nth-child(3) .door-wrapper:nth-child(1) .door-panel { background: linear-gradient(135deg, #11998e, #38ef7d); color: #000; }
+    .door-row:nth-child(3) .door-wrapper:nth-child(2) .door-panel { background: linear-gradient(135deg, #434343, #000000); border: 1px dashed #777; }
+
+    /* Open Door State */
+    .door-wrapper.open .door-panel {
+      transform: rotateY(-115deg);
     }
 
     .door-inside {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-      font-weight: bold;
-      color: #00ffcc;
-      z-index: -1;
-    }
-
-    /* Post Feed */
-    .feed {
-      width: 100%;
-      max-width: 600px;
-      display: flex;
       flex-direction: column;
-      gap: 15px;
-    }
-
-    .post-card {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 15px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    }
-
-    .post-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      color: #bbb;
-      margin-bottom: 10px;
-    }
-
-    .post-content {
-      font-size: 1.05rem;
-      line-height: 1.6;
-      margin-bottom: 15px;
-      white-space: pre-line;
-    }
-
-    .post-actions {
-      display: flex;
-      gap: 15px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding-top: 10px;
-      align-items: center;
-    }
-
-    .action-btn {
-      background: none;
-      border: none;
-      color: #fff;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 0.9rem;
-    }
-
-    /* Floating Add Post Button */
-    .fab {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: linear-gradient(45deg, #ff416c, #ff4b2b);
-      color: white;
-      width: 55px;
-      height: 55px;
-      border-radius: 50%;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
-      display: flex;
       align-items: center;
       justify-content: center;
-    }
-
-    /* Modal Form */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 100;
-    }
-
-    .modal-content {
-      background: #24243e;
-      padding: 20px;
-      border-radius: 15px;
-      width: 100%;
-      max-width: 450px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .modal-content textarea, .modal-content select, .modal-content input {
-      width: 100%;
+      background: radial-gradient(circle, #1c1538, #0b0914);
+      border-radius: 16px;
+      z-index: 1;
       padding: 10px;
-      margin: 8px 0;
-      border-radius: 8px;
-      border: 1px solid #444;
-      background: #1a1a2e;
-      color: white;
+      text-align: center;
     }
 
-    .modal-content button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      background: #ff416c;
-      border: none;
-      color: white;
+    .inside-tag {
+      font-size: 0.85rem;
       font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
+      color: #00f2fe;
+      animation: pulse 1.5s infinite;
+    }
+
+    .inside-desc {
+      font-size: 0.7rem;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="logo">✨ Dil & Hasi</div>
-    <button id="auth-btn" class="auth-btn" onclick="handleAuth()">Google Login</button>
-  </header>
-
-  <!-- Doors -->
-  <div class="doors-container">
-    <div class="door-wrapper" id="door-shayari" onclick="toggleDoor('shayari')">
-      <div class="door shayari">💔 दर्दभरी शायरी</div>
-      <div class="door-inside">Loading...</div>
-    </div>
-    <div class="door-wrapper" id="door-jokes" onclick="toggleDoor('jokes')">
-      <div class="door jokes">😂 धम्माल जोक्स</div>
-      <div class="door-inside">Loading...</div>
+  <!-- Entry Screen -->
+  <div id="auth-screen">
+    <div class="app-title">✨ PORTAL MATRIX</div>
+    <div class="auth-card">
+      <p style="color: #aaa; font-size: 0.9rem;">प्रवेश करण्यासाठी एक पर्याय निवडा</p>
+      <button class="btn-login" onclick="loginGoogle()">🚀 Google Login</button>
+      <button class="btn-guest" onclick="enterGuest()">👤 Guest Entry</button>
     </div>
   </div>
 
-  <!-- Feed -->
-  <div class="feed" id="feed">
-    <div style="text-align: center; color: #888;">लोड होत आहे...</div>
-  </div>
+  <!-- 6 Doors Dashboard -->
+  <div id="portal-screen">
+    <header>
+      <div id="user-display" class="user-tag">👤 Guest</div>
+      <button class="btn-exit" onclick="logout()">बाहेर पडा</button>
+    </header>
 
-  <!-- Add Post FAB -->
-  <button class="fab" onclick="openModal()">➕</button>
+    <div class="door-grid">
+      <!-- Row 1 -->
+      <div class="door-row">
+        <div class="door-wrapper" onclick="toggleDoor(this)">
+          <div class="door-panel">💔<br>Sad Shayari</div>
+          <div class="door-inside">
+            <span class="inside-tag">⏳ Coming Soon...</span>
+            <span class="inside-desc">दर्दभरी शायरी दालन</span>
+          </div>
+        </div>
+        <div class="door-wrapper" onclick="toggleDoor(this)">
+          <div class="door-panel">😂<br>Funny Jokes</div>
+          <div class="door-inside">
+            <span class="inside-tag">⏳ Coming Soon...</span>
+            <span class="inside-desc">धम्माल जोक्स कट्टा</span>
+          </div>
+        </div>
+      </div>
 
-  <!-- Add Post Modal -->
-  <div class="modal" id="postModal">
-    <div class="modal-content">
-      <h3>नवीन पोस्ट करा</h3>
-      <select id="postCategory">
-        <option value="shayari">💔 दर्दभरी शायरी</option>
-        <option value="jokes">😂 धम्माल जोक्स</option>
-      </select>
-      <textarea id="postText" rows="4" placeholder="येथे तुमची शायरी किंवा जोक लिहा..."></textarea>
-      <button onclick="submitPost()">पोस्ट अपलोड करा</button>
-      <button style="background: #555; margin-top: 5px;" onclick="closeModal()">रद्द करा</button>
+      <!-- Row 2 -->
+      <div class="door-row">
+        <div class="door-wrapper" onclick="toggleDoor(this)">
+          <div class="door-panel">🌐<br>Global Live Chat</div>
+          <div class="door-inside">
+            <span class="inside-tag">⏳ Coming Soon...</span>
+            <span class="inside-desc">लाईव्ह वर्ल्ड चॅट</span>
+          </div>
+        </div>
+        <div class="door-wrapper" onclick="toggleDoor(this)">
+          <div class="door-panel">🔒<br>Private Chat<br><small style="font-size:0.65rem;">End-to-End Encrypted</small></div>
+          <div class="door-inside">
+            <span class="inside-tag">⏳ Coming Soon...</span>
+            <span class="inside-desc">सुरक्षित प्रायव्हेट रूम</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3 -->
+      <div class="door-row">
+        <div class="door-wrapper" onclick="toggleDoor(this)">
+          <div class="door-panel">📰<br>Cyber Tech News<br><small style="font-size:0.65rem;">Hacking Newspaper</small></div>
+          <div class="door-inside">
+            <span class="inside-tag">⏳ Coming Soon...</span>
+            <span class="inside-desc">हॅकिंग व टेक अपडेट्स</span>
+          </div>
+        </div>
+        <div class="door-wrapper" onclick="toggleDoor(this)">
+          <div class="door-panel">⏳<br>Coming Soon</div>
+          <div class="door-inside">
+            <span class="inside-tag">🔒 Secret Room</span>
+            <span class="inside-desc">लवकरच उघडणार...</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -286,118 +313,44 @@
 
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
-    const db = firebase.firestore();
 
-    let currentUser = null;
-    let currentCategory = 'shayari';
-
-    // Auth Listener
+    // Check Auth State
     auth.onAuthStateChanged(user => {
-      currentUser = user;
-      const btn = document.getElementById('auth-btn');
       if (user) {
-        btn.innerText = `बाहेर पडा (${user.displayName.split(' ')[0]})`;
-      } else {
-        btn.innerText = "Google Login";
+        showPortal(user.displayName || "Google User");
       }
     });
 
-    function handleAuth() {
-      if (currentUser) {
-        auth.signOut();
-      } else {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider).catch(err => alert(err.message));
-      }
+    // Google Login
+    function loginGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).catch(err => alert("Login Error: " + err.message));
     }
 
-    // Door Selector
-    function toggleDoor(type) {
-      currentCategory = type;
-      document.getElementById('door-shayari').classList.toggle('active', type === 'shayari');
-      document.getElementById('door-jokes').classList.toggle('active', type === 'jokes');
-      loadPosts(type);
+    // Guest Entry
+    function enterGuest() {
+      showPortal("Guest User 👤");
     }
 
-    // Load Posts
-    function loadPosts(category) {
-      db.collection("posts")
-        .where("category", "==", category)
-        .onSnapshot(snapshot => {
-          const feed = document.getElementById('feed');
-          feed.innerHTML = "";
-          if (snapshot.empty) {
-            feed.innerHTML = `<div style="text-align: center; color: #888;">या विभागात अजून कोणतीही पोस्ट नाही. पहिली पोस्ट तुम्ही करा!</div>`;
-            return;
-          }
-          snapshot.forEach(doc => {
-            const data = doc.data();
-            feed.innerHTML += `
-              <div class="post-card">
-                <div class="post-header">
-                  <span>✍️ ${data.author || 'Anonymous'}</span>
-                  <span>${data.likes || 0} Likes</span>
-                </div>
-                <div class="post-content">${data.text}</div>
-                <div class="post-actions">
-                  <button class="action-btn" onclick="likePost('${doc.id}', ${data.likes || 0})">❤️ Like</button>
-                  <button class="action-btn" onclick="sharePost('${data.text}')">📤 Share</button>
-                </div>
-              </div>
-            `;
-          });
-        });
+    // Switch View
+    function showPortal(name) {
+      document.getElementById('auth-screen').style.display = 'none';
+      document.getElementById('portal-screen').style.display = 'flex';
+      document.getElementById('user-display').innerText = "स्वागत आहे, " + name;
     }
 
-    // Like Post
-    function likePost(id, currentLikes) {
-      db.collection("posts").doc(id).update({
-        likes: currentLikes + 1
+    // Logout
+    function logout() {
+      auth.signOut().then(() => {
+        document.getElementById('portal-screen').style.display = 'none';
+        document.getElementById('auth-screen').style.display = 'flex';
       });
     }
 
-    // Share Post
-    function sharePost(text) {
-      if (navigator.share) {
-        navigator.share({ title: 'Dil & Hasi Post', text: text });
-      } else {
-        navigator.clipboard.writeText(text);
-        alert("पोस्ट कॉपी झाली आहे!");
-      }
+    // 3D Door Animation Toggle
+    function toggleDoor(element) {
+      element.classList.toggle('open');
     }
-
-    // Modal Operations
-    function openModal() {
-      if (!currentUser) {
-        alert("कृपया पोस्ट करण्यासाठी आधी वरून Google Login करा!");
-        return;
-      }
-      document.getElementById('postModal').style.display = 'flex';
-    }
-
-    function closeModal() {
-      document.getElementById('postModal').style.display = 'none';
-    }
-
-    function submitPost() {
-      const text = document.getElementById('postText').value.trim();
-      const category = document.getElementById('postCategory').value;
-      if (!text) return alert("कृपया मजकूर टाईप करा!");
-
-      db.collection("posts").add({
-        text: text,
-        category: category,
-        author: currentUser.displayName,
-        likes: 0,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        document.getElementById('postText').value = "";
-        closeModal();
-      });
-    }
-
-    // Default Load
-    toggleDoor('shayari');
   </script>
 </body>
 </html>
