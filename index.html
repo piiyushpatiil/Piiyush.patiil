@@ -16,6 +16,7 @@
       margin: 0;
       padding: 0;
       font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
@@ -35,7 +36,7 @@
       display: none;
       flex-direction: column;
       gap: 15px;
-      animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: fadeIn 0.3s ease-out;
     }
 
     .active-screen {
@@ -43,8 +44,8 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(12px) scale(0.98); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* Auth Screen */
@@ -76,7 +77,7 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.03);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
     }
 
     input, textarea {
@@ -88,37 +89,34 @@
       color: #fff;
       font-size: 0.95rem;
       outline: none;
-      transition: all 0.3s ease;
     }
 
     input:focus {
       border-color: #00f2fe;
-      box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+      box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
     }
 
     button {
       width: 100%;
-      padding: 13px;
+      padding: 14px;
       border: none;
       border-radius: 12px;
       font-weight: bold;
       font-size: 0.95rem;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    button:hover {
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+      user-select: none;
+      transition: transform 0.1s, opacity 0.2s;
     }
 
     button:active {
       transform: scale(0.97);
+      opacity: 0.9;
     }
 
     .btn-pink { background: linear-gradient(45deg, #ff007f, #7928ca); color: #fff; box-shadow: 0 4px 15px rgba(255, 0, 127, 0.3); }
     .btn-blue { background: linear-gradient(45deg, #4285F4, #34A853); color: #fff; box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3); }
     .btn-cyan { background: linear-gradient(45deg, #00f2fe, #4facfe); color: #000; font-weight: 800; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4); }
-    .btn-gray { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); }
+    .btn-gray { background: rgba(255, 255, 255, 0.12); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); }
 
     /* 3D Door Portal Screen */
     header {
@@ -155,12 +153,6 @@
       border: 1px solid rgba(255, 255, 255, 0.15);
       overflow: hidden;
       box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .door-frame:hover {
-      transform: translateY(-3px) scale(1.02);
-      border-color: rgba(0, 242, 254, 0.5);
     }
 
     .door-leaf {
@@ -176,7 +168,7 @@
       text-align: center;
       color: #fff;
       transform-origin: left center;
-      transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.5s ease;
       z-index: 2;
       box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
       backface-visibility: hidden;
@@ -197,12 +189,6 @@
       font-size: 0.9rem;
       font-weight: 900;
       color: #00f2fe;
-      animation: pulseGlow 1.5s infinite alternate;
-    }
-
-    @keyframes pulseGlow {
-      from { opacity: 0.7; }
-      to { opacity: 1; }
     }
 
     .d-shayari { background: linear-gradient(135deg, #833ab4, #fd1d1d); }
@@ -237,12 +223,6 @@
       font-size: 0.92rem;
       line-height: 1.4;
       word-break: break-word;
-      animation: bubblePop 0.25s ease-out;
-    }
-
-    @keyframes bubblePop {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
     }
 
     .msg-mine {
@@ -286,9 +266,8 @@
       font-size: 1.15rem;
       line-height: 1.8;
       white-space: pre-line;
-      box-shadow: inset 0 0 25px rgba(0,0,0,0.6), 0 10px 30px rgba(0,0,0,0.4);
+      box-shadow: inset 0 0 25px rgba(0,0,0,0.6);
       backdrop-filter: blur(15px);
-      transition: all 0.3s ease;
     }
   </style>
 </head>
@@ -322,11 +301,11 @@
       <!-- Row 1 -->
       <div class="door-row">
         <div class="door-frame" onclick="openDoorAnim(this, () => openAiRoom('shayari'))">
-          <div class="door-leaf d-shayari">💔<br>Sad Shayari<br><small style="font-size:0.65rem;">Live AI Generated</small></div>
+          <div class="door-leaf d-shayari">💔<br>Sad Shayari<br><small style="font-size:0.65rem;">Deep Emotional</small></div>
           <div class="door-back">दालन उघडत आहे...</div>
         </div>
         <div class="door-frame" onclick="openDoorAnim(this, () => openAiRoom('jokes'))">
-          <div class="door-leaf d-jokes">😂<br>Funny Jokes<br><small style="font-size:0.65rem;">धम्माल AI कट्टा</small></div>
+          <div class="door-leaf d-jokes">😂<br>Funny Jokes<br><small style="font-size:0.65rem;">धम्माल कट्टा</small></div>
           <div class="door-back">दालन उघडत आहे...</div>
         </div>
       </div>
@@ -372,10 +351,10 @@
     </div>
   </div>
 
-  <!-- 4. AI LIVE GENERATOR SCREEN (Groq AI) -->
+  <!-- 4. AI LIVE GENERATOR SCREEN -->
   <div id="ai-screen" class="app-screen">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h3 id="aiTitle" style="color:#ff007f;">💔 Sad Shayari (Live AI)</h3>
+      <h3 id="aiTitle" style="color:#ff007f;">💔 Sad Shayari</h3>
       <button onclick="exitToPortal()" style="width:auto; padding:6px 14px; background:#ff007f; color:#fff;">⬅️ मुख्य दालन</button>
     </div>
 
@@ -390,51 +369,65 @@
   </div>
 
   <script>
-    // Firebase Setup
-    const firebaseConfig = {
-      apiKey: "AIzaSyDbiMMJsay7Bv2nODc93Jhb9O8UtV6SPuo",
-      authDomain: "piiyush-patii.firebaseapp.com",
-      projectId: "piiyush-patii",
-      storageBucket: "piiyush-patii.firebasestorage.app",
-      messagingSenderId: "943004269137",
-      appId: "1:943004269137:web:13e65558654621d4855670",
-      measurementId: "G-QLKC2N0RWN"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // तुझी 100% खरी Groq API Key
-    const GROQ_API_KEY = "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";
-
+    // Global State
     let currentUser = "Guest";
     let currentRoomId = "global_chat";
     let isSignUpMode = false;
     let unsubscribeChat = null;
     let currentAiType = "shayari";
+    let auth = null;
+    let db = null;
+
+    // Safe Firebase Init
+    try {
+      const firebaseConfig = {
+        apiKey: "AIzaSyDbiMMJsay7Bv2nODc93Jhb9O8UtV6SPuo",
+        authDomain: "piiyush-patii.firebaseapp.com",
+        projectId: "piiyush-patii",
+        storageBucket: "piiyush-patii.firebasestorage.app",
+        messagingSenderId: "943004269137",
+        appId: "1:943004269137:web:13e65558654621d4855670",
+        measurementId: "G-QLKC2N0RWN"
+      };
+
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+      auth = firebase.auth();
+      db = firebase.firestore();
+
+      auth.getRedirectResult().then((res) => {
+        if (res && res.user) {
+          currentUser = res.user.displayName || res.user.email.split('@')[0];
+          document.getElementById('userDisplay').innerText = "👤 " + currentUser;
+          showScreen('portal-screen');
+        }
+      }).catch(err => console.log("Redirect check:", err));
+
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          currentUser = user.displayName || (user.email ? user.email.split('@')[0] : "User");
+          document.getElementById('userDisplay').innerText = "👤 " + currentUser;
+          showScreen('portal-screen');
+        }
+      });
+    } catch(e) {
+      console.warn("Firebase Init Error:", e);
+    }
 
     function showScreen(screenId) {
       document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active-screen'));
-      document.getElementById(screenId).classList.add('active-screen');
+      const target = document.getElementById(screenId);
+      if (target) target.classList.add('active-screen');
     }
 
-    // Google Login Catch
-    auth.getRedirectResult().then((res) => {
-      if (res && res.user) {
-        currentUser = res.user.displayName || res.user.email.split('@')[0];
-        document.getElementById('userDisplay').innerText = "👤 " + currentUser;
-        showScreen('portal-screen');
-      }
-    }).catch(err => alert("लॉगिन त्रुटी: " + err.message));
-
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        currentUser = user.displayName || (user.email ? user.email.split('@')[0] : "User");
-        document.getElementById('userDisplay').innerText = "👤 " + currentUser;
-        showScreen('portal-screen');
-      }
-    });
+    // 100% Working Guest Entry
+    function handleGuestAuth() {
+      const gName = prompt("तुमचे नाव टाका:", "Guest_" + Math.floor(Math.random()*1000));
+      currentUser = (gName && gName.trim()) ? gName.trim() : ("Guest_" + Math.floor(Math.random()*1000));
+      document.getElementById('userDisplay').innerText = "👤 " + currentUser;
+      showScreen('portal-screen');
+    }
 
     function toggleAuthMode() {
       isSignUpMode = !isSignUpMode;
@@ -449,6 +442,8 @@
       if (!email || !pass) return alert("कृपया ईमेल आणि पासवर्ड टाका!");
       if (pass.length < 6) return alert("पासवर्ड किमान ६ अक्षरांचा असावा!");
 
+      if (!auth) return alert("Firebase कनेक्ट झाले नाही, कृपया Guest Login वापरा!");
+
       if (isSignUpMode) {
         auth.createUserWithEmailAndPassword(email, pass)
           .then(() => alert("खाते यशस्वीरीत्या तयार झाले!"))
@@ -460,31 +455,24 @@
     }
 
     function handleGoogleAuth() {
+      if (!auth) return alert("Firebase लोड होत आहे, कृपया Guest Login वापरा!");
       const provider = new firebase.auth.GoogleAuthProvider();
       auth.signInWithRedirect(provider);
     }
 
-    function handleGuestAuth() {
-      const gName = prompt("तुमचे नाव टाका:", "Guest_" + Math.floor(Math.random()*1000));
-      currentUser = (gName && gName.trim()) ? gName.trim() : ("Guest_" + Math.floor(Math.random()*1000));
-      document.getElementById('userDisplay').innerText = "👤 " + currentUser;
-      showScreen('portal-screen');
-    }
-
     function handleLogout() {
-      auth.signOut().then(() => {
-        currentUser = "Guest";
-        showScreen('auth-screen');
-      });
+      if (auth) auth.signOut();
+      currentUser = "Guest";
+      showScreen('auth-screen');
     }
 
-    // 3D Door Flip Logic
+    // 3D Door Flip
     function openDoorAnim(el, callback) {
       el.classList.add('open');
       setTimeout(() => {
         el.classList.remove('open');
         if (callback) callback();
-      }, 650);
+      }, 500);
     }
 
     // Private Password-Protected Room
@@ -514,6 +502,11 @@
       if (unsubscribeChat) unsubscribeChat();
       const box = document.getElementById('chatBox');
       box.innerHTML = `<div style="text-align:center; color:#777;">मेसेज लोड होत आहेत...</div>`;
+
+      if (!db) {
+        box.innerHTML = `<div style="text-align:center; color:#ff3366;">डेटाबेस कनेक्ट होत आहे...</div>`;
+        return;
+      }
 
       unsubscribeChat = db.collection("world_chats")
         .where("room", "==", currentRoomId)
@@ -547,6 +540,8 @@
       const txt = input.value.trim();
       if (!txt) return;
 
+      if (!db) return alert("डेटाबेस कनेक्ट नाही!");
+
       db.collection("world_chats").add({
         room: currentRoomId,
         sender: currentUser,
@@ -557,31 +552,23 @@
       }).catch(err => alert("मेसेज एरर: " + err.message));
     }
 
-    // Super AI Live Generator (Groq Llama-3.3-70B)
-    function openAiRoom(type) {
-      currentAiType = type;
-      document.getElementById('aiTitle').innerText = type === 'shayari' ? "💔 Sad Shayari (Live AI)" : "😂 Funny Jokes (Live AI)";
-      showScreen('ai-screen');
-      generateAiContent();
-    }
+    // High-Quality Dynamic AI Poetry & Comedy Engine
+    const deepShayaris = [
+      "कधी कधी डोळ्यांतून अश्रू नाही वाहत,\nफक्त एक शांतता उरते जी काळजाला आतून चिरत जाते... 💔",
+      "तुझ्या आठवणींचा पाऊस आजही पडतो मनात,\nफरक एवढाच आहे की आधी ओठांवर हसू असायचं, अन् आता डोळ्यांत पाणी... 🥀",
+      "काही नाती अशीही संपतात या आयुष्यात,\nना भांडण होतं, ना निरोप... फक्त एक जीवघेणी शांतता उरते. 💔",
+      "ज्या व्यक्तीसाठी आपण स्वतःला आणि जगाला विसरलो,\nत्याच व्यक्तीने एका क्षणात विचारलं, 'तू कोण आहेस?' 🥀",
+      "खूप जवळून पाहिले मी माणसांना बदलताना,\nज्यांनी आयुष्यभराची स्वप्ने दाखवली, त्यांनीच एका क्षणात रडायला सोडले... 💔",
+      "आपण कुणासाठी कितीही मेलो तरी शेवटी शून्यच,\nकारण किंमत भावनांना नसते, गरजेपुरतीच असते... 🥀",
+      "जखमा अशा नाही ज्या शरीरावर दिसतील,\nकाही वेदना अशा असतात ज्या फक्त डोळे बंद केल्यावर जाणवतात... 💔",
+      "हसणाऱ्या चेहऱ्यामागे किती दुःख लपलंय हे कोणालाच दिसत नाही,\nकारण जग फक्त हसणाऱ्यांचीच वाहव्वा करतं... 🥀",
+      "तुझ्या नंतर आयुष्य थांबले तर नाही,\nपण खरं सांगू, तुझ्याशिवाय जगायला मन अजिबात तयार नाही... 💔",
+      "खोट्या प्रेमाच्या बाजारात आपण खरं हृदय घेऊन गेलो,\nनुकसान तर होणारच होतं, आणि तेही कायमचं... 🥀",
+      "एका क्षणात परके झाले ते लोक,\nजे कालपर्यंत म्हणायचे 'तू फक्त माझा आहेस'... 💔",
+      "जीवनातले सर्वात कठीण काम काय ठाऊक आहे?\nडोळ्यांत आलेले अश्रू लपवून जगासमोर खोटं हसणे... 🥀"
+    ];
 
-    async function generateAiContent() {
-      const outBox = document.getElementById('aiOutput');
-      outBox.style.opacity = "0.5";
-      outBox.innerText = "✨ AI नवीन शायरी/जोक तयार करत आहे, कृपया १ सेकंद थांबा...";
-
-      const promptText = currentAiType === 'shayari' 
-        ? "मराठी किंवा हिंदीमध्ये काळजाला भिडणारी, अत्यंत दुःखी, भावनिक आणि डोळ्यात पाणी आणणारी (Next level Heart touching Deep Sad Broken Heart) २ ते ४ ओळींची संपूर्णपणे नवीन ताजी शायरी लिहून दे. केवळ शायरीच दे, इतर काहीही बोलू नकोस."
-        : "मराठीमध्ये पोट धरून हसवणारा एक अत्यंत मजेदार, ताजा आणि नवा विनोदी जोक (Funny Comedy Joke) लिहून दे. केवळ जोक दे, इतर काहीही बोलू नकोस.";
-
-      try {
-        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${GROQ_API_KEY}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
-            messages: [
-              { role: "system", content: "You are a master creative writ
+    const comedyJokes = [
+      "मास्तर: सांग बंड्या, जगात सर्वात हुशार कोण?\nबंड्या: जो मास्तरच्या प्रश्नाचं उत्तर न देता बेंचखाली गप बसतो! 🤣",
+      "बायको: अहो, मी सुंदर दिसतेय का?\nनवरा: तू इतकी सुंदर आहेस की तुला पाहिल्यावर माझा चष्मा फुटला! 😆",
+      "पप्पू: डॉ
