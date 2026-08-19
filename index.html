@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal Matrix | AI & Live Hub</title>
+  <title>Portal Matrix | 3D AI & Live Hub</title>
   
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -19,7 +19,7 @@
     }
 
     body {
-      background: radial-gradient(circle at 50% 20%, #1a103c, #06050b 80%);
+      background: radial-gradient(circle at 50% 10%, #1c0f38, #05040a 90%);
       color: #fff;
       min-height: 100vh;
       display: flex;
@@ -35,100 +35,132 @@
       display: none;
       flex-direction: column;
       gap: 15px;
+      animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .active-screen {
       display: flex !important;
     }
 
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
     /* Auth Screen */
     .brand-title {
-      font-size: 2.2rem;
+      font-size: 2.3rem;
       font-weight: 900;
       text-align: center;
-      background: linear-gradient(45deg, #ff007f, #00f2fe);
+      background: linear-gradient(45deg, #ff007f, #00f2fe, #7928ca);
+      background-size: 200% 200%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      margin: 15px 0;
-      letter-spacing: 1px;
+      margin: 15px 0 5px 0;
+      letter-spacing: 1.5px;
+      animation: gradientShift 4s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     .glass-card {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(15px);
-      border-radius: 20px;
-      padding: 22px 18px;
+      backdrop-filter: blur(20px);
+      border-radius: 22px;
+      padding: 24px 20px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      gap: 14px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6), inset 0 0 15px rgba(255,255,255,0.03);
     }
 
     input, textarea {
       width: 100%;
-      padding: 12px 14px;
-      background: rgba(0, 0, 0, 0.6);
+      padding: 13px 15px;
+      background: rgba(0, 0, 0, 0.65);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
+      border-radius: 12px;
       color: #fff;
       font-size: 0.95rem;
       outline: none;
+      transition: all 0.3s ease;
+    }
+
+    input:focus {
+      border-color: #00f2fe;
+      box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
     }
 
     button {
       width: 100%;
-      padding: 12px;
+      padding: 13px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       font-weight: bold;
       font-size: 0.95rem;
       cursor: pointer;
-      transition: 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    button:hover {
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
     }
 
     button:active {
-      transform: scale(0.98);
+      transform: scale(0.97);
     }
 
-    .btn-pink { background: linear-gradient(45deg, #ff007f, #7928ca); color: #fff; }
-    .btn-blue { background: linear-gradient(45deg, #4285F4, #34A853); color: #fff; }
-    .btn-cyan { background: linear-gradient(45deg, #00f2fe, #4facfe); color: #000; font-weight: 800; }
+    .btn-pink { background: linear-gradient(45deg, #ff007f, #7928ca); color: #fff; box-shadow: 0 4px 15px rgba(255, 0, 127, 0.3); }
+    .btn-blue { background: linear-gradient(45deg, #4285F4, #34A853); color: #fff; box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3); }
+    .btn-cyan { background: linear-gradient(45deg, #00f2fe, #4facfe); color: #000; font-weight: 800; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4); }
     .btn-gray { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); }
 
-    /* Portal Screen (3D Doors) */
+    /* 3D Door Portal Screen */
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       background: rgba(255, 255, 255, 0.05);
       padding: 12px 18px;
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(10px);
     }
 
     .door-grid {
       display: flex;
       flex-direction: column;
-      gap: 15px;
-      perspective: 1000px;
+      gap: 16px;
+      perspective: 1200px;
     }
 
     .door-row {
       display: flex;
-      gap: 15px;
+      gap: 16px;
     }
 
     .door-frame {
       flex: 1;
-      height: 125px;
-      background: #080612;
-      border-radius: 16px;
+      height: 130px;
+      background: #080614;
+      border-radius: 18px;
       position: relative;
       perspective: 1200px;
       cursor: pointer;
       border: 1px solid rgba(255, 255, 255, 0.15);
       overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .door-frame:hover {
+      transform: translateY(-3px) scale(1.02);
+      border-color: rgba(0, 242, 254, 0.5);
     }
 
     .door-leaf {
@@ -140,17 +172,18 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
+      font-weight: 800;
       text-align: center;
       color: #fff;
-      transform-origin: left;
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: left center;
+      transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
       z-index: 2;
-      box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+      backface-visibility: hidden;
     }
 
     .door-frame.open .door-leaf {
-      transform: rotateY(-110deg);
+      transform: rotateY(-115deg);
     }
 
     .door-back {
@@ -160,17 +193,24 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle, #ff007f, #1a102f);
-      font-size: 0.85rem;
-      font-weight: bold;
+      background: radial-gradient(circle, #ff007f, #130a24);
+      font-size: 0.9rem;
+      font-weight: 900;
+      color: #00f2fe;
+      animation: pulseGlow 1.5s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      from { opacity: 0.7; }
+      to { opacity: 1; }
     }
 
     .d-shayari { background: linear-gradient(135deg, #833ab4, #fd1d1d); }
     .d-jokes { background: linear-gradient(135deg, #f12711, #f5af19); }
     .d-live { background: linear-gradient(135deg, #00f2fe, #4facfe); color: #000 !important; }
-    .d-private { background: linear-gradient(135deg, #1f4037, #99f2c8); color: #000 !important; }
-    .d-news { background: linear-gradient(135deg, #11998e, #38ef7d); color: #000 !important; }
-    .d-secret { background: linear-gradient(135deg, #3a3d40, #181719); }
+    .d-private { background: linear-gradient(135deg, #11998e, #38ef7d); color: #000 !important; }
+    .d-news { background: linear-gradient(135deg, #ff758c, #ff7eb3); }
+    .d-secret { background: linear-gradient(135deg, #434343, #000000); }
 
     /* Chat Screen */
     #chat-screen {
@@ -180,40 +220,50 @@
     .chat-box {
       flex: 1;
       overflow-y: auto;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 14px;
-      padding: 12px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
+      backdrop-filter: blur(10px);
     }
 
     .msg-bubble {
       max-width: 82%;
-      padding: 8px 12px;
-      border-radius: 12px;
-      font-size: 0.9rem;
-      line-height: 1.3;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.92rem;
+      line-height: 1.4;
       word-break: break-word;
+      animation: bubblePop 0.25s ease-out;
+    }
+
+    @keyframes bubblePop {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
     }
 
     .msg-mine {
       align-self: flex-end;
       background: linear-gradient(135deg, #00f2fe, #4facfe);
       color: #000;
+      border-bottom-right-radius: 4px;
+      font-weight: 500;
     }
 
     .msg-other {
       align-self: flex-start;
       background: rgba(255, 255, 255, 0.12);
+      border-bottom-left-radius: 4px;
     }
 
     .msg-sender {
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       color: #ff007f;
       font-weight: bold;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
     }
 
     .chat-controls {
@@ -224,19 +274,21 @@
     /* AI Hub Screen */
     .ai-card {
       background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 20px;
-      padding: 25px 20px;
-      min-height: 200px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 22px;
+      padding: 28px 22px;
+      min-height: 220px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
       font-size: 1.15rem;
-      line-height: 1.6;
+      line-height: 1.8;
       white-space: pre-line;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+      box-shadow: inset 0 0 25px rgba(0,0,0,0.6), 0 10px 30px rgba(0,0,0,0.4);
+      backdrop-filter: blur(15px);
+      transition: all 0.3s ease;
     }
   </style>
 </head>
@@ -250,31 +302,31 @@
       <input type="password" id="passInput" placeholder="पासवर्ड (किमान ६ अक्षरे)" />
       
       <button class="btn-pink" id="emailBtn" onclick="handleEmailAuth()">📧 Gmail ने लॉगिन करा</button>
-      <div style="font-size:0.8rem; color:#00f2fe; text-align:center; cursor:pointer;" onclick="toggleAuthMode()" id="authToggleText">नवीन युजर आहात? येथे Sign Up करा</div>
+      <div style="font-size:0.82rem; color:#00f2fe; text-align:center; cursor:pointer;" onclick="toggleAuthMode()" id="authToggleText">नवीन युजर आहात? येथे Sign Up करा</div>
       
-      <div style="text-align:center; color:#666; font-size:0.8rem;">— किंवा —</div>
+      <div style="text-align:center; color:#777; font-size:0.8rem;">— किंवा —</div>
 
       <button class="btn-blue" onclick="handleGoogleAuth()">🚀 Google Account ने Login</button>
-      <button class="btn-gray" onclick="handleGuestAuth()">👤 Guest Entry</button>
+      <button class="btn-gray" onclick="handleGuestAuth()">👤 Guest Entry (थेट नाव टाकून)</button>
     </div>
   </div>
 
-  <!-- 2. PORTAL SCREEN -->
+  <!-- 2. PORTAL SCREEN (3D DOORS) -->
   <div id="portal-screen" class="app-screen">
     <header>
-      <div id="userDisplay" style="color:#00f2fe; font-weight:bold;">👤 User</div>
-      <button onclick="handleLogout()" style="width:auto; padding:6px 14px; background:#ff3366; color:#fff;">बाहेर पडा</button>
+      <div id="userDisplay" style="color:#00f2fe; font-weight:bold; font-size:1.05rem;">👤 User</div>
+      <button onclick="handleLogout()" style="width:auto; padding:7px 15px; background:#ff3366; color:#fff;">बाहेर पडा</button>
     </header>
 
     <div class="door-grid">
       <!-- Row 1 -->
       <div class="door-row">
         <div class="door-frame" onclick="openDoorAnim(this, () => openAiRoom('shayari'))">
-          <div class="door-leaf d-shayari">💔<br>Sad Shayari<br><small style="font-size:0.65rem;">AI Generated</small></div>
+          <div class="door-leaf d-shayari">💔<br>Sad Shayari<br><small style="font-size:0.65rem;">Live AI Generated</small></div>
           <div class="door-back">दालन उघडत आहे...</div>
         </div>
         <div class="door-frame" onclick="openDoorAnim(this, () => openAiRoom('jokes'))">
-          <div class="door-leaf d-jokes">😂<br>Funny Jokes<br><small style="font-size:0.65rem;">AI Generated</small></div>
+          <div class="door-leaf d-jokes">😂<br>Funny Jokes<br><small style="font-size:0.65rem;">धम्माल AI कट्टा</small></div>
           <div class="door-back">दालन उघडत आहे...</div>
         </div>
       </div>
@@ -293,8 +345,8 @@
 
       <!-- Row 3 -->
       <div class="door-row">
-        <div class="door-frame" onclick="openDoorAnim(this, () => alert('📰 Cyber Tech News लवकरच येईल!'))">
-          <div class="door-leaf d-news">📰<br>Tech News<br><small style="font-size:0.65rem;">Hacking News</small></div>
+        <div class="door-frame" onclick="openDoorAnim(this, () => alert('📰 Cyber Tech News लवकरच सुरू होईल!'))">
+          <div class="door-leaf d-news">📰<br>Tech News<br><small style="font-size:0.65rem;">Cyber Updates</small></div>
           <div class="door-back">उघडत आहे...</div>
         </div>
         <div class="door-frame" onclick="openDoorAnim(this, () => alert('⏳ Secret Room लवकरच उघडेल!'))">
@@ -308,7 +360,7 @@
   <!-- 3. REALTIME CHAT SCREEN -->
   <div id="chat-screen" class="app-screen">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h3 id="chatTitle" style="color:#00f2fe; font-size:1.1rem;">🌐 Global Chat</h3>
+      <h3 id="chatTitle" style="color:#00f2fe; font-size:1.15rem;">🌐 Global Chat</h3>
       <button onclick="exitToPortal()" style="width:auto; padding:6px 14px; background:#00f2fe; color:#000;">⬅️ मुख्य दालन</button>
     </div>
     
@@ -316,29 +368,29 @@
 
     <div class="chat-controls">
       <input type="text" id="msgInput" placeholder="काहीतरी मेसेज लिहा..." onkeypress="if(event.key==='Enter') sendMsg()" />
-      <button class="btn-pink" style="width:80px;" onclick="sendMsg()">पाठवा</button>
+      <button class="btn-pink" style="width:85px;" onclick="sendMsg()">पाठवा</button>
     </div>
   </div>
 
-  <!-- 4. AI GENERATOR SCREEN -->
+  <!-- 4. AI LIVE GENERATOR SCREEN (Groq AI) -->
   <div id="ai-screen" class="app-screen">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h3 id="aiTitle" style="color:#ff007f;">💔 Sad Shayari</h3>
+      <h3 id="aiTitle" style="color:#ff007f;">💔 Sad Shayari (Live AI)</h3>
       <button onclick="exitToPortal()" style="width:auto; padding:6px 14px; background:#ff007f; color:#fff;">⬅️ मुख्य दालन</button>
     </div>
 
     <div class="ai-card" id="aiOutput">
-      येथे ताजी शायरी दिसेल...
+      येथे ताजी शायरी तयार होत आहे...
     </div>
 
     <div style="display:flex; gap:10px;">
-      <button class="btn-cyan" id="aiGenerateBtn" onclick="generateAiContent()">✨ आणखी नवीन द्या 🔄</button>
+      <button class="btn-cyan" id="aiGenerateBtn" onclick="generateAiContent()">✨ आणखी नवीन तयार करा 🔄</button>
       <button class="btn-gray" style="width:100px;" onclick="copyAiText()">📋 Copy</button>
     </div>
   </div>
 
   <script>
-    // Firebase Config
+    // Firebase Setup
     const firebaseConfig = {
       apiKey: "AIzaSyDbiMMJsay7Bv2nODc93Jhb9O8UtV6SPuo",
       authDomain: "piiyush-patii.firebaseapp.com",
@@ -353,8 +405,8 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // तुझी जोडलेली Gemini API Key
-    const GEMINI_API_KEY = "AQ.Ab8RN6JkoiJtPwf6iROlQNzpw-14GUKN3VYTKXx1Z6i2KIvIzA";
+    // तुझी 100% खरी Groq API Key
+    const GROQ_API_KEY = "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";
 
     let currentUser = "Guest";
     let currentRoomId = "global_chat";
@@ -367,7 +419,7 @@
       document.getElementById(screenId).classList.add('active-screen');
     }
 
-    // Google Login Check
+    // Google Login Catch
     auth.getRedirectResult().then((res) => {
       if (res && res.user) {
         currentUser = res.user.displayName || res.user.email.split('@')[0];
@@ -426,13 +478,13 @@
       });
     }
 
-    // 3D Door Animation
+    // 3D Door Flip Logic
     function openDoorAnim(el, callback) {
       el.classList.add('open');
       setTimeout(() => {
         el.classList.remove('open');
         if (callback) callback();
-      }, 600);
+      }, 650);
     }
 
     // Private Password-Protected Room
@@ -505,46 +557,31 @@
       }).catch(err => alert("मेसेज एरर: " + err.message));
     }
 
-    // AI Generation Logic (Gemini API)
+    // Super AI Live Generator (Groq Llama-3.3-70B)
     function openAiRoom(type) {
       currentAiType = type;
-      document.getElementById('aiTitle').innerText = type === 'shayari' ? "💔 Sad Shayari (Next-Level AI)" : "😂 Funny Jokes (AI कट्टा)";
+      document.getElementById('aiTitle').innerText = type === 'shayari' ? "💔 Sad Shayari (Live AI)" : "😂 Funny Jokes (Live AI)";
       showScreen('ai-screen');
       generateAiContent();
     }
 
     async function generateAiContent() {
       const outBox = document.getElementById('aiOutput');
-      outBox.innerText = "✨ AI नवीन तयार करत आहे, कृपया १ सेकंद थांबा...";
+      outBox.style.opacity = "0.5";
+      outBox.innerText = "✨ AI नवीन शायरी/जोक तयार करत आहे, कृपया १ सेकंद थांबा...";
 
       const promptText = currentAiType === 'shayari' 
-        ? "मराठी किंवा हिंदीमध्ये मनाला स्पर्शून जाणारी, अत्यंत दर्जेदार, भावनिक आणि दुःखी (Next-level Heart touching Deep Sad Broken Heart) २ ते ४ ओळींची शायरी लिहून दे. केवळ शायरीच दे, इतर काहीही बोलू नकोस."
-        : "मराठीमध्ये पोट धरून हसवणारा एक अत्यंत मजेदार आणि नवा विनोदी जोक (Funny Comedy Joke) लिहून दे. केवळ जोक दे, इतर काहीही बोलू नकोस.";
+        ? "मराठी किंवा हिंदीमध्ये काळजाला भिडणारी, अत्यंत दुःखी, भावनिक आणि डोळ्यात पाणी आणणारी (Next level Heart touching Deep Sad Broken Heart) २ ते ४ ओळींची संपूर्णपणे नवीन ताजी शायरी लिहून दे. केवळ शायरीच दे, इतर काहीही बोलू नकोस."
+        : "मराठीमध्ये पोट धरून हसवणारा एक अत्यंत मजेदार, ताजा आणि नवा विनोदी जोक (Funny Comedy Joke) लिहून दे. केवळ जोक दे, इतर काहीही बोलू नकोस.";
 
       try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Authorization": `Bearer ${GROQ_API_KEY}`,
+            "Content-Type": "application/json"
+          },
           body: JSON.stringify({
-            contents: [{ parts: [{ text: promptText }] }]
-          })
-        });
-
-        const data = await response.json();
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
-          outBox.innerText = data.candidates[0].content.parts[0].text.trim();
-        } else {
-          outBox.innerText = "💔 शायरी लोड होऊ शकली नाही. कृपया पुन्हा प्रयत्न करा.";
-        }
-      } catch (err) {
-        outBox.innerText = "त्रुटी: इंटरनेट कनेक्शन किंवा API तपासा.";
-      }
-    }
-
-    function copyAiText() {
-      const text = document.getElementById('aiOutput').innerText;
-      navigator.clipboard.writeText(text).then(() => alert("📋 मजकूर कॉपी झाला!"));
-    }
-  </script>
-</body>
-</html>
+            model: "llama-3.3-70b-versatile",
+            messages: [
+              { role: "system", content: "You are a master creative writ
