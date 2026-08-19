@@ -2,8 +2,8 @@
 <html lang="mr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal Matrix | 3D AI & Live Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Portal Matrix | Master Hub</title>
   
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -59,28 +59,21 @@
       -webkit-text-fill-color: transparent;
       margin: 15px 0 5px 0;
       letter-spacing: 1.5px;
-      animation: gradientShift 4s ease infinite;
-    }
-
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
     }
 
     .glass-card {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.07);
       border: 1px solid rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(20px);
       border-radius: 22px;
-      padding: 24px 20px;
+      padding: 22px 18px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
       box-shadow: 0 15px 35px rgba(0,0,0,0.6);
     }
 
-    input, textarea {
+    input {
       width: 100%;
       padding: 13px 15px;
       background: rgba(0, 0, 0, 0.65);
@@ -98,7 +91,7 @@
 
     button {
       width: 100%;
-      padding: 14px;
+      padding: 13px;
       border: none;
       border-radius: 12px;
       font-weight: bold;
@@ -118,7 +111,7 @@
     .btn-cyan { background: linear-gradient(45deg, #00f2fe, #4facfe); color: #000; font-weight: 800; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4); }
     .btn-gray { background: rgba(255, 255, 255, 0.12); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); }
 
-    /* 3D Door Portal Screen */
+    /* Portal Screen (3D Doors) */
     header {
       display: flex;
       justify-content: space-between;
@@ -133,18 +126,18 @@
     .door-grid {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 15px;
       perspective: 1200px;
     }
 
     .door-row {
       display: flex;
-      gap: 16px;
+      gap: 15px;
     }
 
     .door-frame {
       flex: 1;
-      height: 130px;
+      height: 125px;
       background: #080614;
       border-radius: 18px;
       position: relative;
@@ -195,7 +188,7 @@
     .d-jokes { background: linear-gradient(135deg, #f12711, #f5af19); }
     .d-live { background: linear-gradient(135deg, #00f2fe, #4facfe); color: #000 !important; }
     .d-private { background: linear-gradient(135deg, #11998e, #38ef7d); color: #000 !important; }
-    .d-news { background: linear-gradient(135deg, #ff758c, #ff7eb3); }
+    .d-news { background: linear-gradient(135deg, #ff758c, #ff7eb3); color: #000 !important; }
     .d-secret { background: linear-gradient(135deg, #434343, #000000); }
 
     /* Chat Screen */
@@ -251,7 +244,7 @@
       gap: 8px;
     }
 
-    /* AI Hub Screen */
+    /* Content Screen (Shayari & Jokes) */
     .ai-card {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.18);
@@ -280,13 +273,13 @@
       <input type="email" id="emailInput" placeholder="Gmail / Email आयडी" />
       <input type="password" id="passInput" placeholder="पासवर्ड (किमान ६ अक्षरे)" />
       
-      <button class="btn-pink" id="emailBtn" onclick="handleEmailAuth()">📧 Gmail ने लॉगिन करा</button>
-      <div style="font-size:0.82rem; color:#00f2fe; text-align:center; cursor:pointer;" onclick="toggleAuthMode()" id="authToggleText">नवीन युजर आहात? येथे Sign Up करा</div>
+      <button class="btn-pink" id="emailBtn">📧 Gmail ने लॉगिन करा</button>
+      <div style="font-size:0.82rem; color:#00f2fe; text-align:center; cursor:pointer;" id="authToggleText">नवीन युजर आहात? येथे Sign Up करा</div>
       
       <div style="text-align:center; color:#777; font-size:0.8rem;">— किंवा —</div>
 
-      <button class="btn-blue" onclick="handleGoogleAuth()">🚀 Google Account ने Login</button>
-      <button class="btn-gray" onclick="handleGuestAuth()">👤 Guest Entry (थेट नाव टाकून)</button>
+      <button class="btn-blue" id="googleBtn">🚀 Google Account ने Login</button>
+      <button class="btn-gray" id="guestBtn">👤 Guest Entry (थेट नाव टाकून)</button>
     </div>
   </div>
 
@@ -294,17 +287,17 @@
   <div id="portal-screen" class="app-screen">
     <header>
       <div id="userDisplay" style="color:#00f2fe; font-weight:bold; font-size:1.05rem;">👤 User</div>
-      <button onclick="handleLogout()" style="width:auto; padding:7px 15px; background:#ff3366; color:#fff;">बाहेर पडा</button>
+      <button id="logoutBtn" style="width:auto; padding:7px 15px; background:#ff3366; color:#fff;">बाहेर पडा</button>
     </header>
 
     <div class="door-grid">
       <!-- Row 1 -->
       <div class="door-row">
-        <div class="door-frame" onclick="openDoorAnim(this, () => openAiRoom('shayari'))">
+        <div class="door-frame" id="doorShayari">
           <div class="door-leaf d-shayari">💔<br>Sad Shayari<br><small style="font-size:0.65rem;">Deep Emotional</small></div>
           <div class="door-back">दालन उघडत आहे...</div>
         </div>
-        <div class="door-frame" onclick="openDoorAnim(this, () => openAiRoom('jokes'))">
+        <div class="door-frame" id="doorJokes">
           <div class="door-leaf d-jokes">😂<br>Funny Jokes<br><small style="font-size:0.65rem;">धम्माल कट्टा</small></div>
           <div class="door-back">दालन उघडत आहे...</div>
         </div>
@@ -312,11 +305,11 @@
 
       <!-- Row 2 -->
       <div class="door-row">
-        <div class="door-frame" onclick="openDoorAnim(this, () => openChatRoom('global_chat', '🌐 Global Live Chat'))">
+        <div class="door-frame" id="doorLive">
           <div class="door-leaf d-live">🌐<br>Live Chat<br><small style="font-size:0.65rem;">Public Room</small></div>
           <div class="door-back">आत जात आहे...</div>
         </div>
-        <div class="door-frame" onclick="openDoorAnim(this, promptPrivateRoom)">
+        <div class="door-frame" id="doorPrivate">
           <div class="door-leaf d-private">🔒<br>Private Chat<br><small style="font-size:0.65rem;">Pass-Protected</small></div>
           <div class="door-back">प्रायव्हेट रूम...</div>
         </div>
@@ -324,12 +317,12 @@
 
       <!-- Row 3 -->
       <div class="door-row">
-        <div class="door-frame" onclick="openDoorAnim(this, () => alert('📰 Cyber Tech News लवकरच सुरू होईल!'))">
+        <div class="door-frame" id="doorNews">
           <div class="door-leaf d-news">📰<br>Tech News<br><small style="font-size:0.65rem;">Cyber Updates</small></div>
           <div class="door-back">उघडत आहे...</div>
         </div>
-        <div class="door-frame" onclick="openDoorAnim(this, () => alert('⏳ Secret Room लवकरच उघडेल!'))">
-          <div class="door-leaf d-secret">⏳<br>Coming Soon</div>
+        <div class="door-frame" id="doorSecret">
+          <div class="door-leaf d-secret">⏳<br>Secret Vault<br><small style="font-size:0.65rem;">Coming Soon</small></div>
           <div class="door-back">उघडत आहे...</div>
         </div>
       </div>
@@ -340,45 +333,45 @@
   <div id="chat-screen" class="app-screen">
     <div style="display:flex; justify-content:space-between; align-items:center;">
       <h3 id="chatTitle" style="color:#00f2fe; font-size:1.15rem;">🌐 Global Chat</h3>
-      <button onclick="exitToPortal()" style="width:auto; padding:6px 14px; background:#00f2fe; color:#000;">⬅️ मुख्य दालन</button>
+      <button id="chatBackBtn" style="width:auto; padding:6px 14px; background:#00f2fe; color:#000;">⬅️ मुख्य दालन</button>
     </div>
     
     <div id="chatBox" class="chat-box"></div>
 
     <div class="chat-controls">
-      <input type="text" id="msgInput" placeholder="काहीतरी मेसेज लिहा..." onkeypress="if(event.key==='Enter') sendMsg()" />
-      <button class="btn-pink" style="width:85px;" onclick="sendMsg()">पाठवा</button>
+      <input type="text" id="msgInput" placeholder="काहीतरी मेसेज लिहा..." />
+      <button class="btn-pink" style="width:85px;" id="sendBtn">पाठवा</button>
     </div>
   </div>
 
-  <!-- 4. AI LIVE GENERATOR SCREEN -->
-  <div id="ai-screen" class="app-screen">
+  <!-- 4. SHAYARI & JOKES SCREEN -->
+  <div id="content-screen" class="app-screen">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h3 id="aiTitle" style="color:#ff007f;">💔 Sad Shayari</h3>
-      <button onclick="exitToPortal()" style="width:auto; padding:6px 14px; background:#ff007f; color:#fff;">⬅️ मुख्य दालन</button>
+      <h3 id="contentTitle" style="color:#ff007f;">💔 Sad Shayari</h3>
+      <button id="contentBackBtn" style="width:auto; padding:6px 14px; background:#ff007f; color:#fff;">⬅️ मुख्य दालन</button>
     </div>
 
-    <div class="ai-card" id="aiOutput">
-      येथे ताजी शायरी तयार होत आहे...
+    <div class="ai-card" id="outputBox">
+      येथे ताजी शायरी दिसेल...
     </div>
 
     <div style="display:flex; gap:10px;">
-      <button class="btn-cyan" id="aiGenerateBtn" onclick="generateAiContent()">✨ आणखी नवीन तयार करा 🔄</button>
-      <button class="btn-gray" style="width:100px;" onclick="copyAiText()">📋 Copy</button>
+      <button class="btn-cyan" id="nextContentBtn">✨ आणखी नवीन तयार करा 🔄</button>
+      <button class="btn-gray" style="width:100px;" id="copyContentBtn">📋 Copy</button>
     </div>
   </div>
 
   <script>
-    // Global State
+    // State Management
     let currentUser = "Guest";
     let currentRoomId = "global_chat";
     let isSignUpMode = false;
+    let currentMode = "shayari";
     let unsubscribeChat = null;
-    let currentAiType = "shayari";
     let auth = null;
     let db = null;
 
-    // Safe Firebase Init
+    // Safe Firebase Initializer
     try {
       const firebaseConfig = {
         apiKey: "AIzaSyDbiMMJsay7Bv2nODc93Jhb9O8UtV6SPuo",
@@ -402,7 +395,7 @@
           document.getElementById('userDisplay').innerText = "👤 " + currentUser;
           showScreen('portal-screen');
         }
-      }).catch(err => console.log("Redirect check:", err));
+      }).catch(err => console.log("Google redirect status:", err));
 
       auth.onAuthStateChanged(user => {
         if (user) {
@@ -412,147 +405,26 @@
         }
       });
     } catch(e) {
-      console.warn("Firebase Init Error:", e);
+      console.warn("Firebase safe mode active:", e);
     }
 
+    // Screen Router
     function showScreen(screenId) {
       document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active-screen'));
       const target = document.getElementById(screenId);
       if (target) target.classList.add('active-screen');
     }
 
-    // 100% Working Guest Entry
-    function handleGuestAuth() {
-      const gName = prompt("तुमचे नाव टाका:", "Guest_" + Math.floor(Math.random()*1000));
-      currentUser = (gName && gName.trim()) ? gName.trim() : ("Guest_" + Math.floor(Math.random()*1000));
-      document.getElementById('userDisplay').innerText = "👤 " + currentUser;
-      showScreen('portal-screen');
-    }
-
-    function toggleAuthMode() {
-      isSignUpMode = !isSignUpMode;
-      document.getElementById('emailBtn').innerText = isSignUpMode ? "📝 नवीन खाते बनवा (Sign Up)" : "📧 Gmail ने लॉगिन करा";
-      document.getElementById('authToggleText').innerText = isSignUpMode ? "आधीच खाते आहे? लॉगिन करा" : "नवीन युजर आहात? येथे Sign Up करा";
-    }
-
-    function handleEmailAuth() {
-      const email = document.getElementById('emailInput').value.trim();
-      const pass = document.getElementById('passInput').value.trim();
-
-      if (!email || !pass) return alert("कृपया ईमेल आणि पासवर्ड टाका!");
-      if (pass.length < 6) return alert("पासवर्ड किमान ६ अक्षरांचा असावा!");
-
-      if (!auth) return alert("Firebase कनेक्ट झाले नाही, कृपया Guest Login वापरा!");
-
-      if (isSignUpMode) {
-        auth.createUserWithEmailAndPassword(email, pass)
-          .then(() => alert("खाते यशस्वीरीत्या तयार झाले!"))
-          .catch(err => alert("Sign Up त्रुटी: " + err.message));
-      } else {
-        auth.signInWithEmailAndPassword(email, pass)
-          .catch(err => alert("लॉगिन त्रुटी: " + err.message));
-      }
-    }
-
-    function handleGoogleAuth() {
-      if (!auth) return alert("Firebase लोड होत आहे, कृपया Guest Login वापरा!");
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithRedirect(provider);
-    }
-
-    function handleLogout() {
-      if (auth) auth.signOut();
-      currentUser = "Guest";
-      showScreen('auth-screen');
-    }
-
-    // 3D Door Flip
-    function openDoorAnim(el, callback) {
+    // 3D Door Flip Animation
+    function triggerDoor(el, callback) {
       el.classList.add('open');
       setTimeout(() => {
         el.classList.remove('open');
         if (callback) callback();
-      }, 500);
+      }, 450);
     }
 
-    // Private Password-Protected Room
-    function promptPrivateRoom() {
-      const gName = prompt("🔐 प्रायव्हेट ग्रुपचे नाव टाका:");
-      if (!gName || !gName.trim()) return;
-      const gPass = prompt("🔑 ग्रुपचा पासवर्ड टाका:");
-      if (!gPass || !gPass.trim()) return;
-
-      const roomId = "priv_" + gName.trim().toLowerCase() + "_" + gPass.trim();
-      openChatRoom(roomId, "🔒 रूम: " + gName.trim());
-    }
-
-    function openChatRoom(roomId, titleText) {
-      currentRoomId = roomId;
-      document.getElementById('chatTitle').innerText = titleText;
-      showScreen('chat-screen');
-      listenToMessages();
-    }
-
-    function exitToPortal() {
-      if (unsubscribeChat) unsubscribeChat();
-      showScreen('portal-screen');
-    }
-
-    function listenToMessages() {
-      if (unsubscribeChat) unsubscribeChat();
-      const box = document.getElementById('chatBox');
-      box.innerHTML = `<div style="text-align:center; color:#777;">मेसेज लोड होत आहेत...</div>`;
-
-      if (!db) {
-        box.innerHTML = `<div style="text-align:center; color:#ff3366;">डेटाबेस कनेक्ट होत आहे...</div>`;
-        return;
-      }
-
-      unsubscribeChat = db.collection("world_chats")
-        .where("room", "==", currentRoomId)
-        .onSnapshot(snap => {
-          box.innerHTML = "";
-          if (snap.empty) {
-            box.innerHTML = `<div style="text-align:center; color:#777; margin-top:20px;">या रूममध्ये अजून मेसेज नाहीत. पहिला मेसेज पाठवा! 💬</div>`;
-            return;
-          }
-
-          let messages = [];
-          snap.forEach(doc => messages.push(doc.data()));
-          messages.sort((a, b) => (a.time?.seconds || 0) - (b.time?.seconds || 0));
-
-          messages.forEach(m => {
-            const isMe = m.sender === currentUser;
-            const bubble = document.createElement('div');
-            bubble.className = `msg-bubble ${isMe ? 'msg-mine' : 'msg-other'}`;
-            bubble.innerHTML = `
-              ${!isMe ? `<div class="msg-sender">${m.sender}</div>` : ''}
-              <div>${m.text}</div>
-            `;
-            box.appendChild(bubble);
-          });
-          box.scrollTop = box.scrollHeight;
-        });
-    }
-
-    function sendMsg() {
-      const input = document.getElementById('msgInput');
-      const txt = input.value.trim();
-      if (!txt) return;
-
-      if (!db) return alert("डेटाबेस कनेक्ट नाही!");
-
-      db.collection("world_chats").add({
-        room: currentRoomId,
-        sender: currentUser,
-        text: txt,
-        time: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        input.value = "";
-      }).catch(err => alert("मेसेज एरर: " + err.message));
-    }
-
-    // High-Quality Dynamic AI Poetry & Comedy Engine
+    // Deep Sad Shayari & Comedy Jokes Data Pools
     const deepShayaris = [
       "कधी कधी डोळ्यांतून अश्रू नाही वाहत,\nफक्त एक शांतता उरते जी काळजाला आतून चिरत जाते... 💔",
       "तुझ्या आठवणींचा पाऊस आजही पडतो मनात,\nफरक एवढाच आहे की आधी ओठांवर हसू असायचं, अन् आता डोळ्यांत पाणी... 🥀",
@@ -571,4 +443,123 @@
     const comedyJokes = [
       "मास्तर: सांग बंड्या, जगात सर्वात हुशार कोण?\nबंड्या: जो मास्तरच्या प्रश्नाचं उत्तर न देता बेंचखाली गप बसतो! 🤣",
       "बायको: अहो, मी सुंदर दिसतेय का?\nनवरा: तू इतकी सुंदर आहेस की तुला पाहिल्यावर माझा चष्मा फुटला! 😆",
-      "पप्पू: डॉ
+      "पप्पू: डॉक्टर साहेब, मला झोपेत बोलायची वाईट सवय आहे.\nडॉक्टर: काही औषध लिहून देऊ का?\nपप्पू: नको डॉक्टर, फक्त बायकोच्या माहेरी जायची सोय करा! 😂",
+      "ग्राहक: दुकानदार साहेब, असा साबण द्या ज्याने माणूस गोरा होईल!\nदुकानदार: साबण नाही, पण आधार कार्ड एडिट करणारा ॲप नक्की देऊ शकतो! 🤣",
+      "मुलगा: पप्पा, मला सायकल हवीय!\nपप्पा: घरात बसून पुस्तक वाच, ज्ञानाने सर्व काही मिळते!\nमुलगा: मग पुस्तकावर बसून शाळेत जाऊ का? 😂",
+      "सासू: जावईबापू, आज जेवणात काय बनवू?\nजावई: काहीही बनवा, पण शेवटी बाहेरून मागवावं लागणार नाही एवढंच बघा! 😆",
+      "शिक्षक: सांग चिंटू, १ रुपयाचे १०० पैसे होतात, तर ५ रुपयांचे काय होईल?\nचिंटू: सर, थेट कुरकुरेचं पाकीट येईल! 🤣"
+    ];
+
+    let lastIdx = -1;
+    function generateContent() {
+      const outBox = document.getElementById('outputBox');
+      outBox.style.opacity = "0.3";
+
+      setTimeout(() => {
+        const pool = currentMode === 'shayari' ? deepShayaris : comedyJokes;
+        let r = Math.floor(Math.random() * pool.length);
+        while (r === lastIdx && pool.length > 1) {
+          r = Math.floor(Math.random() * pool.length);
+        }
+        lastIdx = r;
+        outBox.innerText = pool[r];
+        outBox.style.opacity = "1";
+      }, 150);
+    }
+
+    // Direct Event Bindings (100% Reliable & Non-Freezing)
+    document.getElementById('guestBtn').onclick = function() {
+      const gName = prompt("तुमचे नाव टाका:", "Guest_" + Math.floor(Math.random()*1000));
+      currentUser = (gName && gName.trim()) ? gName.trim() : ("Guest_" + Math.floor(Math.random()*1000));
+      document.getElementById('userDisplay').innerText = "👤 " + currentUser;
+      showScreen('portal-screen');
+    };
+
+    document.getElementById('authToggleText').onclick = function() {
+      isSignUpMode = !isSignUpMode;
+      document.getElementById('emailBtn').innerText = isSignUpMode ? "📝 नवीन खाते बनवा (Sign Up)" : "📧 Gmail ने लॉगिन करा";
+      document.getElementById('authToggleText').innerText = isSignUpMode ? "आधीच खाते आहे? लॉगिन करा" : "नवीन युजर आहात? येथे Sign Up करा";
+    };
+
+    document.getElementById('emailBtn').onclick = function() {
+      const email = document.getElementById('emailInput').value.trim();
+      const pass = document.getElementById('passInput').value.trim();
+
+      if (!email || !pass) return alert("कृपया ईमेल आणि पासवर्ड टाका!");
+      if (pass.length < 6) return alert("पासवर्ड किमान ६ अक्षरांचा असावा!");
+
+      if (!auth) {
+        alert("Firebase कनेक्ट नाही, Guest Login द्वारे आत जात आहे!");
+        currentUser = email.split('@')[0];
+        document.getElementById('userDisplay').innerText = "👤 " + currentUser;
+        return showScreen('portal-screen');
+      }
+
+      if (isSignUpMode) {
+        auth.createUserWithEmailAndPassword(email, pass)
+          .then(() => alert("खाते यशस्वीरीत्या तयार झाले!"))
+          .catch(err => alert("Sign Up त्रुटी: " + err.message));
+      } else {
+        auth.signInWithEmailAndPassword(email, pass)
+          .catch(err => alert("लॉगिन त्रुटी: " + err.message));
+      }
+    };
+
+    document.getElementById('googleBtn').onclick = function() {
+      if (!auth) return alert("Firebase लोड होत आहे, कृपया Guest Login वापरा!");
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithRedirect(provider);
+    };
+
+    document.getElementById('logoutBtn').onclick = function() {
+      if (auth) auth.signOut();
+      currentUser = "Guest";
+      showScreen('auth-screen');
+    };
+
+    // 3D Door Click Listeners
+    document.getElementById('doorShayari').onclick = function() {
+      triggerDoor(this, () => {
+        currentMode = "shayari";
+        document.getElementById('contentTitle').innerText = "💔 Sad Shayari";
+        document.getElementById('contentTitle').style.color = "#ff007f";
+        generateContent();
+        showScreen('content-screen');
+      });
+    };
+
+    document.getElementById('doorJokes').onclick = function() {
+      triggerDoor(this, () => {
+        currentMode = "jokes";
+        document.getElementById('contentTitle').innerText = "😂 Funny Jokes";
+        document.getElementById('contentTitle').style.color = "#f5af19";
+        generateContent();
+        showScreen('content-screen');
+      });
+    };
+
+    document.getElementById('doorLive').onclick = function() {
+      triggerDoor(this, () => {
+        openChatRoom('global_chat', '🌐 Global Live Chat');
+      });
+    };
+
+    document.getElementById('doorPrivate').onclick = function() {
+      triggerDoor(this, () => {
+        const gName = prompt("🔐 प्रायव्हेट ग्रुपचे नाव टाका:");
+        if (!gName || !gName.trim()) return;
+        const gPass = prompt("🔑 ग्रुपचा पासवर्ड टाका:");
+        if (!gPass || !gPass.trim()) return;
+
+        const roomId = "priv_" + gName.trim().toLowerCase() + "_" + gPass.trim();
+        openChatRoom(roomId, "🔒 रूम: " + gName.trim());
+      });
+    };
+
+    document.getElementById('doorNews').onclick = function() {
+      triggerDoor(this, () => {
+        alert("📰 Cyber Tech News दालन लवकरच सुरू होत आहे!");
+      });
+    };
+
+    document.getElementById('doorSecret').onclick =
