@@ -2,26 +2,305 @@
 <html lang="mr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal Matrix</title>
-  <!-- Firebase SDKs -->
+  
+  <!-- Firebase Libraries -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-</head>
-<body style="background:#05040a; color:white; font-family:sans-serif; text-align:center; padding:20px;">
 
-  <h2>✨ PORTAL MATRIX</h2>
-  
-  <div style="max-width:300px; margin:auto;">
-    <input type="email" id="email" placeholder="Email" style="width:100%; padding:10px; margin:5px; border-radius:5px;">
-    <input type="password" id="pass" placeholder="Password" style="width:100%; padding:10px; margin:5px; border-radius:5px;">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 20%, #1a103c, #06050b 80%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 15px;
+      overflow-x: hidden;
+    }
+
+    /* Screens */
+    .app-screen {
+      width: 100%;
+      max-width: 480px;
+      display: none;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .active-screen {
+      display: flex !important;
+    }
+
+    /* Auth Screen */
+    .brand-title {
+      font-size: 2.2rem;
+      font-weight: 900;
+      text-align: center;
+      background: linear-gradient(45deg, #ff007f, #00f2fe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 20px 0;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-pink { background: linear-gradient(45deg, #ff007f, #7928ca); color: #fff; }
+    .btn-blue { background: linear-gradient(45deg, #4285F4, #34A853); color: #fff; }
+    .btn-gray { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); }
+
+    /* Portal Screen (3D Doors) */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 12px 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .door-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      perspective: 1000px;
+    }
+
+    .door-row {
+      display: flex;
+      gap: 15px;
+    }
+
+    .door-frame {
+      flex: 1;
+      height: 125px;
+      background: #080612;
+      border-radius: 16px;
+      position: relative;
+      perspective: 1200px;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      overflow: hidden;
+    }
+
+    .door-leaf {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0; left: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      text-align: center;
+      color: #fff;
+      transform-origin: left;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 2;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.5);
+    }
+
+    .door-frame.open .door-leaf {
+      transform: rotateY(-110deg);
+    }
+
+    .door-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle, #ff007f, #1a102f);
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    /* Door Colors */
+    .d-shayari { background: linear-gradient(135deg, #833ab4, #fd1d1d); }
+    .d-jokes { background: linear-gradient(135deg, #f12711, #f5af19); }
+    .d-live { background: linear-gradient(135deg, #00f2fe, #4facfe); color: #000 !important; }
+    .d-private { background: linear-gradient(135deg, #1f4037, #99f2c8); color: #000 !important; }
+    .d-news { background: linear-gradient(135deg, #11998e, #38ef7d); color: #000 !important; }
+    .d-secret { background: linear-gradient(135deg, #3a3d40, #181719); }
+
+    /* Chat Screen */
+    #chat-screen {
+      height: 92vh;
+    }
+
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-box {
+      flex: 1;
+      overflow-y: auto;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .msg-bubble {
+      max-width: 80%;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      line-height: 1.3;
+    }
+
+    .msg-mine {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #00f2fe, #4facfe);
+      color: #000;
+    }
+
+    .msg-other {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .msg-sender {
+      font-size: 0.72rem;
+      color: #ff007f;
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+
+    .chat-controls {
+      display: flex;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. AUTH SCREEN -->
+  <div id="auth-screen" class="app-screen active-screen">
+    <div class="brand-title">✨ PORTAL MATRIX</div>
+    <div class="glass-card">
+      <input type="email" id="emailInput" placeholder="Gmail / Email" />
+      <input type="password" id="passInput" placeholder="पासवर्ड (किमान ६ अक्षरे)" />
+      <button class="btn-pink" id="emailBtn" onclick="handleEmailAuth()">📧 Login / Register</button>
+      <button class="btn-blue" onclick="handleGoogleAuth()">🚀 Google Login</button>
+      <button class="btn-gray" onclick="handleGuestAuth()">👤 Guest Entry</button>
+    </div>
+  </div>
+
+  <!-- 2. PORTAL SCREEN -->
+  <div id="portal-screen" class="app-screen">
+    <header>
+      <div id="userDisplay" style="color:#00f2fe; font-weight:bold;">👤 User</div>
+      <button onclick="handleLogout()" style="width:auto; padding:6px 12px; background:#ff3366; color:#fff;">बाहेर पडा</button>
+    </header>
+
+    <div class="door-grid">
+      <div class="door-row">
+        <div class="door-frame" onclick="openDoorAnim(this, () => alert('💔 Sad Shayari दालन लवकरच सुरू होईल!'))">
+          <div class="door-leaf d-shayari">💔<br>Sad Shayari</div>
+          <div class="door-back">उघडत आहे...</div>
+        </div>
+        <div class="door-frame" onclick="openDoorAnim(this, () => alert('😂 Jokes कट्टा लवकरच सुरू होईल!'))">
+          <div class="door-leaf d-jokes">😂<br>Funny Jokes</div>
+          <div class="door-back">उघडत आहे...</div>
+        </div>
+      </div>
+
+      <div class="door-row">
+        <div class="door-frame" onclick="openDoorAnim(this, () => openChatRoom('global_chat', '🌐 Global Live Chat'))">
+          <div class="door-leaf d-live">🌐<br>Live Chat</div>
+          <div class="door-back">आत जात आहे...</div>
+        </div>
+        <div class="door-frame" onclick="openDoorAnim(this, promptPrivateRoom)">
+          <div class="door-leaf d-private">🔒<br>Private Chat</div>
+          <div class="door-back">पासवर्ड रूम...</div>
+        </div>
+      </div>
+
+      <div class="door-row">
+        <div class="door-frame" onclick="openDoorAnim(this, () => alert('📰 Cyber News लवकरच येईल!'))">
+          <div class="door-leaf d-news">📰<br>Tech News</div>
+          <div class="door-back">उघडत आहे...</div>
+        </div>
+        <div class="door-frame" onclick="openDoorAnim(this, () => alert('⏳ Secret Room लवकरच उघडेल!'))">
+          <div class="door-leaf d-secret">⏳<br>Coming Soon</div>
+          <div class="door-back">उघडत आहे...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. CHAT SCREEN -->
+  <div id="chat-screen" class="app-screen">
+    <div class="chat-header">
+      <h3 id="chatTitle" style="color:#00f2fe;">🌐 Global Chat</h3>
+      <button onclick="exitChatToPortal()" style="width:auto; padding:6px 12px; background:#00f2fe; color:#000;">⬅️ बाहेर</button>
+    </div>
     
-    <button onclick="checkAuth()" style="width:100%; padding:10px; margin:5px; background:#ff007f; color:white; border:none; border-radius:5px;">Login / Signup</button>
-    <button onclick="checkGoogle()" style="width:100%; padding:10px; margin:5px; background:#4285F4; color:white; border:none; border-radius:5px;">Google Login</button>
-    <button onclick="checkGuest()" style="width:100%; padding:10px; margin:5px; background:#555; color:white; border:none; border-radius:5px;">Guest Entry</button>
+    <div id="chatBox" class="chat-box"></div>
+
+    <div class="chat-controls">
+      <input type="text" id="msgInput" placeholder="काहीतरी मेसेज लिहा..." onkeypress="if(event.key==='Enter') sendMsg()" />
+      <button class="btn-pink" style="width:80px;" onclick="sendMsg()">पाठवा</button>
+    </div>
   </div>
 
   <script>
+    // Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyDbiMMJsay7Bv2nODc93Jhb9O8UtV6SPuo",
       authDomain: "piiyush-patii.firebaseapp.com",
@@ -32,33 +311,150 @@
       measurementId: "G-QLKC2N0RWN"
     };
 
-    // Firebase Initialize
-    try {
-        firebase.initializeApp(firebaseConfig);
-        console.log("Firebase Connected");
-    } catch(err) {
-        alert("Firebase Error: " + err.message);
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser = "Guest";
+    let currentRoomId = "global_chat";
+    let unsubscribeChat = null;
+
+    // View Navigation
+    function showScreen(screenId) {
+      document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active-screen'));
+      document.getElementById(screenId).classList.add('active-screen');
     }
 
-    // Function checks
-    function checkAuth() { 
-        alert("Email Login बटण चाललंय!"); 
-        const e = document.getElementById('email').value;
-        const p = document.getElementById('pass').value;
-        if(!e || !p) return alert("Email/Pass टाक!");
-        firebase.auth().signInWithEmailAndPassword(e, p)
-            .catch(() => firebase.auth().createUserWithEmailAndPassword(e, p).then(()=>alert("Account created!")));
+    // Auth Listeners
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user.displayName || (user.email ? user.email.split('@')[0] : "User");
+        document.getElementById('userDisplay').innerText = "👤 " + currentUser;
+        showScreen('portal-screen');
+      }
+    });
+
+    // 1. Email Login / Sign up
+    function handleEmailAuth() {
+      const email = document.getElementById('emailInput').value.trim();
+      const pass = document.getElementById('passInput').value.trim();
+
+      if (!email || !pass) return alert("कृपया ईमेल आणि पासवर्ड टाका!");
+      if (pass.length < 6) return alert("पासवर्ड किमान ६ अक्षरांचा असावा!");
+
+      auth.signInWithEmailAndPassword(email, pass).catch(() => {
+        auth.createUserWithEmailAndPassword(email, pass)
+          .then(() => alert("नवीन खाते यशस्वीपणे तयार झाले!"))
+          .catch(err => alert("त्रुटी: " + err.message));
+      });
     }
 
-    function checkGoogle() { 
-        alert("Google Login बटण चाललंय!"); 
-        firebase.auth().signInWithRedirect(new firebase.auth.GoogleAuthProvider());
+    // 2. Google Login
+    function handleGoogleAuth() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithRedirect(provider);
     }
 
-    function checkGuest() { 
-        alert("Guest बटण चाललंय!"); 
-        window.location.href = "https://google.com"; // टेस्ट साठी
+    // 3. Guest Entry
+    function handleGuestAuth() {
+      const gName = prompt("तुमचे नाव टाका:", "Guest_" + Math.floor(Math.random()*1000));
+      currentUser = (gName && gName.trim()) ? gName.trim() : ("Guest_" + Math.floor(Math.random()*1000));
+      document.getElementById('userDisplay').innerText = "👤 " + currentUser;
+      showScreen('portal-screen');
+    }
+
+    // Logout
+    function handleLogout() {
+      auth.signOut().then(() => {
+        currentUser = "Guest";
+        showScreen('auth-screen');
+      });
+    }
+
+    // 3D Door Animation Function
+    function openDoorAnim(el, callback) {
+      el.classList.add('open');
+      setTimeout(() => {
+        el.classList.remove('open');
+        if (callback) callback();
+      }, 600);
+    }
+
+    // Private Room Prompt
+    function promptPrivateRoom() {
+      const gName = prompt("🔐 प्रायव्हेट ग्रुपचे नाव टाका:");
+      if (!gName || !gName.trim()) return;
+      const gPass = prompt("🔑 ग्रुपचा पासवर्ड टाका:");
+      if (!gPass || !gPass.trim()) return;
+
+      const roomId = "priv_" + gName.trim().toLowerCase() + "_" + gPass.trim();
+      openChatRoom(roomId, "🔒 रूम: " + gName.trim());
+    }
+
+    // Open Chat
+    function openChatRoom(roomId, titleText) {
+      currentRoomId = roomId;
+      document.getElementById('chatTitle').innerText = titleText;
+      showScreen('chat-screen');
+      listenToMessages();
+    }
+
+    function exitChatToPortal() {
+      if (unsubscribeChat) unsubscribeChat();
+      showScreen('portal-screen');
+    }
+
+    // Realtime Database Listen
+    function listenToMessages() {
+      if (unsubscribeChat) unsubscribeChat();
+      const box = document.getElementById('chatBox');
+      box.innerHTML = `<div style="text-align:center; color:#777;">मेसेज लोड होत आहेत...</div>`;
+
+      unsubscribeChat = db.collection("world_chats")
+        .where("room", "==", currentRoomId)
+        .onSnapshot(snap => {
+          box.innerHTML = "";
+          if (snap.empty) {
+            box.innerHTML = `<div style="text-align:center; color:#777; margin-top:20px;">या रूममध्ये अजून मेसेज नाहीत. पहिला मेसेज पाठवा! 💬</div>`;
+            return;
+          }
+
+          let messages = [];
+          snap.forEach(doc => messages.push(doc.data()));
+          messages.sort((a, b) => (a.time?.seconds || 0) - (b.time?.seconds || 0));
+
+          messages.forEach(m => {
+            const isMe = m.sender === currentUser;
+            const bubble = document.createElement('div');
+            bubble.className = `msg-bubble ${isMe ? 'msg-mine' : 'msg-other'}`;
+            bubble.innerHTML = `
+              ${!isMe ? `<div class="msg-sender">${m.sender}</div>` : ''}
+              <div>${m.text}</div>
+            `;
+            box.appendChild(bubble);
+          });
+          box.scrollTop = box.scrollHeight;
+        });
+    }
+
+    // Send Message
+    function sendMsg() {
+      const input = document.getElementById('msgInput');
+      const txt = input.value.trim();
+      if (!txt) return;
+
+      db.collection("world_chats").add({
+        room: currentRoomId,
+        sender: currentUser,
+        text: txt,
+        time: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        input.value = "";
+      }).catch(err => {
+        alert("त्रुटी: " + err.message);
+      });
     }
   </script>
 </body>
-</html>
+  </html>
+  
