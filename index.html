@@ -1,565 +1,415 @@
 <!DOCTYPE html>
-<html lang="mr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Portal Matrix | Master Hub</title>
-  
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1110">
+  <title>MyVault - Personal Password Manager</title>
 
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', Roboto, -apple-system, sans-serif;
-      -webkit-tap-highlight-color: transparent;
     }
 
     body {
-      background: radial-gradient(circle at 50% 10%, #1c0f38, #05040a 90%);
-      color: #fff;
+      font-family: Arial, sans-serif;
+      background: #07100f;
+      color: #ffffff;
+      min-height: 100vh;
+    }
+
+    .app {
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      padding: 15px;
-      overflow-x: hidden;
+      justify-content: center;
+      padding: 20px;
     }
 
-    .app-screen {
+    .card {
       width: 100%;
-      max-width: 480px;
-      display: none;
-      flex-direction: column;
-      gap: 15px;
-      animation: fadeIn 0.3s ease-out;
+      max-width: 420px;
+      background: #101b19;
+      border: 1px solid #243a35;
+      border-radius: 24px;
+      padding: 32px 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.45);
     }
 
-    .active-screen {
-      display: flex !important;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Auth Screen */
-    .brand-title {
-      font-size: 2.3rem;
-      font-weight: 900;
-      text-align: center;
-      background: linear-gradient(45deg, #ff007f, #00f2fe, #7928ca);
-      background-size: 200% 200%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin: 15px 0 5px 0;
-      letter-spacing: 1.5px;
-    }
-
-    .glass-card {
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(20px);
+    .logo {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 20px;
       border-radius: 22px;
-      padding: 22px 18px;
+      background: #22c55e;
       display: flex;
-      flex-direction: column;
-      gap: 12px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+      align-items: center;
+      justify-content: center;
+      font-size: 38px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #9aada8;
+      margin-bottom: 30px;
+      line-height: 1.5;
+    }
+
+    .security {
+      background: #0b1513;
+      border: 1px solid #243a35;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 24px;
+      color: #b8c8c4;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #dce8e5;
+      font-size: 14px;
+    }
+
+    .password-box {
+      position: relative;
     }
 
     input {
       width: 100%;
-      padding: 13px 15px;
-      background: rgba(0, 0, 0, 0.65);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 15px;
+      padding-right: 50px;
       border-radius: 12px;
-      color: #fff;
-      font-size: 0.95rem;
+      border: 1px solid #304943;
+      background: #0b1513;
+      color: white;
       outline: none;
+      font-size: 16px;
     }
 
     input:focus {
-      border-color: #00f2fe;
-      box-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+      border-color: #22c55e;
     }
 
-    button {
+    .show-btn {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      background: none;
+      border: none;
+      color: #8da39d;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .btn {
       width: 100%;
-      padding: 13px;
       border: none;
       border-radius: 12px;
+      padding: 15px;
+      margin-top: 18px;
+      background: #22c55e;
+      color: #041009;
+      font-size: 16px;
       font-weight: bold;
-      font-size: 0.95rem;
       cursor: pointer;
-      user-select: none;
-      transition: transform 0.1s, opacity 0.2s;
     }
 
-    button:active {
-      transform: scale(0.97);
-      opacity: 0.9;
+    .btn:active {
+      transform: scale(0.98);
     }
 
-    .btn-pink { background: linear-gradient(45deg, #ff007f, #7928ca); color: #fff; box-shadow: 0 4px 15px rgba(255, 0, 127, 0.3); }
-    .btn-blue { background: linear-gradient(45deg, #4285F4, #34A853); color: #fff; box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3); }
-    .btn-cyan { background: linear-gradient(45deg, #00f2fe, #4facfe); color: #000; font-weight: 800; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.4); }
-    .btn-gray { background: rgba(255, 255, 255, 0.12); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); }
+    .fingerprint {
+      width: 100%;
+      margin-top: 12px;
+      padding: 13px;
+      background: transparent;
+      border: 1px solid #304943;
+      border-radius: 12px;
+      color: #dce8e5;
+      cursor: pointer;
+      font-size: 14px;
+    }
 
-    /* Portal Screen (3D Doors) */
-    header {
+    .footer {
+      text-align: center;
+      margin-top: 25px;
+      color: #71857f;
+      font-size: 12px;
+    }
+
+    /* Vault screen */
+
+    #vaultScreen {
+      display: none;
+      width: 100%;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .vault-container {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .topbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 12px 18px;
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(10px);
+      margin-bottom: 25px;
     }
 
-    .door-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      perspective: 1200px;
-    }
-
-    .door-row {
-      display: flex;
-      gap: 15px;
-    }
-
-    .door-frame {
-      flex: 1;
-      height: 125px;
-      background: #080614;
-      border-radius: 18px;
-      position: relative;
-      perspective: 1200px;
-      cursor: pointer;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-    }
-
-    .door-leaf {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      top: 0; left: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      text-align: center;
-      color: #fff;
-      transform-origin: left center;
-      transition: transform 0.5s ease;
-      z-index: 2;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
-      backface-visibility: hidden;
-    }
-
-    .door-frame.open .door-leaf {
-      transform: rotateY(-115deg);
-    }
-
-    .door-back {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(circle, #ff007f, #130a24);
-      font-size: 0.9rem;
-      font-weight: 900;
-      color: #00f2fe;
-    }
-
-    .d-shayari { background: linear-gradient(135deg, #833ab4, #fd1d1d); }
-    .d-jokes { background: linear-gradient(135deg, #f12711, #f5af19); }
-    .d-live { background: linear-gradient(135deg, #00f2fe, #4facfe); color: #000 !important; }
-    .d-private { background: linear-gradient(135deg, #11998e, #38ef7d); color: #000 !important; }
-    .d-news { background: linear-gradient(135deg, #ff758c, #ff7eb3); color: #000 !important; }
-    .d-secret { background: linear-gradient(135deg, #434343, #000000); }
-
-    /* Chat Screen */
-    #chat-screen {
-      height: 92vh;
-    }
-
-    .chat-box {
-      flex: 1;
-      overflow-y: auto;
-      background: rgba(0, 0, 0, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 16px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      backdrop-filter: blur(10px);
-    }
-
-    .msg-bubble {
-      max-width: 82%;
-      padding: 10px 14px;
-      border-radius: 16px;
-      font-size: 0.92rem;
-      line-height: 1.4;
-      word-break: break-word;
-    }
-
-    .msg-mine {
-      align-self: flex-end;
-      background: linear-gradient(135deg, #00f2fe, #4facfe);
-      color: #000;
-      border-bottom-right-radius: 4px;
-      font-weight: 500;
-    }
-
-    .msg-other {
-      align-self: flex-start;
-      background: rgba(255, 255, 255, 0.12);
-      border-bottom-left-radius: 4px;
-    }
-
-    .msg-sender {
-      font-size: 0.75rem;
-      color: #ff007f;
+    .brand {
+      font-size: 24px;
       font-weight: bold;
-      margin-bottom: 3px;
     }
 
-    .chat-controls {
-      display: flex;
-      gap: 8px;
+    .lock-btn {
+      background: #172521;
+      border: 1px solid #304943;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
     }
 
-    /* Content Screen (Shayari & Jokes) */
-    .ai-card {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      border-radius: 22px;
-      padding: 28px 22px;
-      min-height: 220px;
+    .welcome {
+      color: #8fa49e;
+      margin-bottom: 20px;
+    }
+
+    .search {
+      margin-bottom: 20px;
+    }
+
+    .items {
+      display: grid;
+      gap: 12px;
+    }
+
+    .item {
+      background: #101b19;
+      border: 1px solid #243a35;
+      padding: 18px;
+      border-radius: 16px;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      text-align: center;
-      font-size: 1.15rem;
-      line-height: 1.8;
-      white-space: pre-line;
-      box-shadow: inset 0 0 25px rgba(0,0,0,0.6);
-      backdrop-filter: blur(15px);
+    }
+
+    .item-name {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .item-user {
+      color: #899e98;
+      font-size: 13px;
+    }
+
+    .add-btn {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      width: 58px;
+      height: 58px;
+      border: none;
+      border-radius: 50%;
+      background: #22c55e;
+      color: #041009;
+      font-size: 28px;
+      cursor: pointer;
     }
   </style>
 </head>
+
 <body>
 
-  <!-- 1. AUTH SCREEN -->
-  <div id="auth-screen" class="app-screen active-screen">
-    <div class="brand-title">✨ PORTAL MATRIX</div>
-    <div class="glass-card">
-      <input type="email" id="emailInput" placeholder="Gmail / Email आयडी" />
-      <input type="password" id="passInput" placeholder="पासवर्ड (किमान ६ अक्षरे)" />
-      
-      <button class="btn-pink" id="emailBtn">📧 Gmail ने लॉगिन करा</button>
-      <div style="font-size:0.82rem; color:#00f2fe; text-align:center; cursor:pointer;" id="authToggleText">नवीन युजर आहात? येथे Sign Up करा</div>
-      
-      <div style="text-align:center; color:#777; font-size:0.8rem;">— किंवा —</div>
+  <!-- LOCK SCREEN -->
+  <main class="app" id="lockScreen">
 
-      <button class="btn-blue" id="googleBtn">🚀 Google Account ने Login</button>
-      <button class="btn-gray" id="guestBtn">👤 Guest Entry (थेट नाव टाकून)</button>
-    </div>
-  </div>
+    <section class="card">
 
-  <!-- 2. PORTAL SCREEN (3D DOORS) -->
-  <div id="portal-screen" class="app-screen">
-    <header>
-      <div id="userDisplay" style="color:#00f2fe; font-weight:bold; font-size:1.05rem;">👤 User</div>
-      <button id="logoutBtn" style="width:auto; padding:7px 15px; background:#ff3366; color:#fff;">बाहेर पडा</button>
-    </header>
+      <div class="logo">🔐</div>
 
-    <div class="door-grid">
-      <!-- Row 1 -->
-      <div class="door-row">
-        <div class="door-frame" id="doorShayari">
-          <div class="door-leaf d-shayari">💔<br>Sad Shayari<br><small style="font-size:0.65rem;">Deep Emotional</small></div>
-          <div class="door-back">दालन उघडत आहे...</div>
-        </div>
-        <div class="door-frame" id="doorJokes">
-          <div class="door-leaf d-jokes">😂<br>Funny Jokes<br><small style="font-size:0.65rem;">धम्माल कट्टा</small></div>
-          <div class="door-back">दालन उघडत आहे...</div>
-        </div>
+      <h1>MyVault</h1>
+
+      <p class="subtitle">
+        Your personal password manager
+      </p>
+
+      <div class="security">
+        🛡️ Your vault will be protected with strong encryption.
       </div>
 
-      <!-- Row 2 -->
-      <div class="door-row">
-        <div class="door-frame" id="doorLive">
-          <div class="door-leaf d-live">🌐<br>Live Chat<br><small style="font-size:0.65rem;">Public Room</small></div>
-          <div class="door-back">आत जात आहे...</div>
-        </div>
-        <div class="door-frame" id="doorPrivate">
-          <div class="door-leaf d-private">🔒<br>Private Chat<br><small style="font-size:0.65rem;">Pass-Protected</small></div>
-          <div class="door-back">प्रायव्हेट रूम...</div>
-        </div>
+      <label for="masterPassword">
+        Master Password
+      </label>
+
+      <div class="password-box">
+
+        <input
+          id="masterPassword"
+          type="password"
+          placeholder="Enter your master password"
+          autocomplete="off"
+        >
+
+        <button
+          class="show-btn"
+          onclick="togglePassword()"
+          aria-label="Show password"
+        >
+          👁
+        </button>
+
       </div>
 
-      <!-- Row 3 -->
-      <div class="door-row">
-        <div class="door-frame" id="doorNews">
-          <div class="door-leaf d-news">📰<br>Tech News<br><small style="font-size:0.65rem;">Cyber Updates</small></div>
-          <div class="door-back">उघडत आहे...</div>
+      <button class="btn" onclick="unlockVault()">
+        🔓 Unlock Vault
+      </button>
+
+      <button class="fingerprint" onclick="biometricMessage()">
+        👆 Use Fingerprint
+      </button>
+
+      <p class="footer">
+        MyVault • Personal & Private
+      </p>
+
+    </section>
+
+  </main>
+
+
+  <!-- VAULT SCREEN -->
+  <section id="vaultScreen">
+
+    <div class="vault-container">
+
+      <div class="topbar">
+
+        <div class="brand">
+          🔐 MyVault
         </div>
-        <div class="door-frame" id="doorSecret">
-          <div class="door-leaf d-secret">⏳<br>Secret Vault<br><small style="font-size:0.65rem;">Coming Soon</small></div>
-          <div class="door-back">उघडत आहे...</div>
-        </div>
+
+        <button class="lock-btn" onclick="lockVault()">
+          🔒 Lock
+        </button>
+
       </div>
-    </div>
-  </div>
 
-  <!-- 3. REALTIME CHAT SCREEN -->
-  <div id="chat-screen" class="app-screen">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h3 id="chatTitle" style="color:#00f2fe; font-size:1.15rem;">🌐 Global Chat</h3>
-      <button id="chatBackBtn" style="width:auto; padding:6px 14px; background:#00f2fe; color:#000;">⬅️ मुख्य दालन</button>
-    </div>
-    
-    <div id="chatBox" class="chat-box"></div>
+      <p class="welcome">
+        Your encrypted password vault
+      </p>
 
-    <div class="chat-controls">
-      <input type="text" id="msgInput" placeholder="काहीतरी मेसेज लिहा..." />
-      <button class="btn-pink" style="width:85px;" id="sendBtn">पाठवा</button>
-    </div>
-  </div>
+      <div class="search">
+        <input
+          type="search"
+          placeholder="🔍 Search passwords..."
+          id="searchInput"
+        >
+      </div>
 
-  <!-- 4. SHAYARI & JOKES SCREEN -->
-  <div id="content-screen" class="app-screen">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h3 id="contentTitle" style="color:#ff007f;">💔 Sad Shayari</h3>
-      <button id="contentBackBtn" style="width:auto; padding:6px 14px; background:#ff007f; color:#fff;">⬅️ मुख्य दालन</button>
+      <div class="items">
+
+        <div class="item">
+          <div>
+            <div class="item-name">Google</div>
+            <div class="item-user">example@gmail.com</div>
+          </div>
+          <div>⭐</div>
+        </div>
+
+        <div class="item">
+          <div>
+            <div class="item-name">Instagram</div>
+            <div class="item-user">Your Instagram account</div>
+          </div>
+          <div>⭐</div>
+        </div>
+
+        <div class="item">
+          <div>
+            <div class="item-name">Facebook</div>
+            <div class="item-user">Your Facebook account</div>
+          </div>
+          <div>☆</div>
+        </div>
+
+      </div>
+
     </div>
 
-    <div class="ai-card" id="outputBox">
-      येथे ताजी शायरी दिसेल...
-    </div>
+    <button class="add-btn" onclick="addPassword()">
+      +
+    </button>
 
-    <div style="display:flex; gap:10px;">
-      <button class="btn-cyan" id="nextContentBtn">✨ आणखी नवीन तयार करा 🔄</button>
-      <button class="btn-gray" style="width:100px;" id="copyContentBtn">📋 Copy</button>
-    </div>
-  </div>
+  </section>
+
 
   <script>
-    // State Management
-    let currentUser = "Guest";
-    let currentRoomId = "global_chat";
-    let isSignUpMode = false;
-    let currentMode = "shayari";
-    let unsubscribeChat = null;
-    let auth = null;
-    let db = null;
 
-    // Safe Firebase Initializer
-    try {
-      const firebaseConfig = {
-        apiKey: "AIzaSyDbiMMJsay7Bv2nODc93Jhb9O8UtV6SPuo",
-        authDomain: "piiyush-patii.firebaseapp.com",
-        projectId: "piiyush-patii",
-        storageBucket: "piiyush-patii.firebasestorage.app",
-        messagingSenderId: "943004269137",
-        appId: "1:943004269137:web:13e65558654621d4855670",
-        measurementId: "G-QLKC2N0RWN"
-      };
+    function togglePassword() {
+      const input = document.getElementById("masterPassword");
 
-      if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-      }
-      auth = firebase.auth();
-      db = firebase.firestore();
-
-      auth.getRedirectResult().then((res) => {
-        if (res && res.user) {
-          currentUser = res.user.displayName || res.user.email.split('@')[0];
-          document.getElementById('userDisplay').innerText = "👤 " + currentUser;
-          showScreen('portal-screen');
-        }
-      }).catch(err => console.log("Google redirect status:", err));
-
-      auth.onAuthStateChanged(user => {
-        if (user) {
-          currentUser = user.displayName || (user.email ? user.email.split('@')[0] : "User");
-          document.getElementById('userDisplay').innerText = "👤 " + currentUser;
-          showScreen('portal-screen');
-        }
-      });
-    } catch(e) {
-      console.warn("Firebase safe mode active:", e);
-    }
-
-    // Screen Router
-    function showScreen(screenId) {
-      document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active-screen'));
-      const target = document.getElementById(screenId);
-      if (target) target.classList.add('active-screen');
-    }
-
-    // 3D Door Flip Animation
-    function triggerDoor(el, callback) {
-      el.classList.add('open');
-      setTimeout(() => {
-        el.classList.remove('open');
-        if (callback) callback();
-      }, 450);
-    }
-
-    // Deep Sad Shayari & Comedy Jokes Data Pools
-    const deepShayaris = [
-      "कधी कधी डोळ्यांतून अश्रू नाही वाहत,\nफक्त एक शांतता उरते जी काळजाला आतून चिरत जाते... 💔",
-      "तुझ्या आठवणींचा पाऊस आजही पडतो मनात,\nफरक एवढाच आहे की आधी ओठांवर हसू असायचं, अन् आता डोळ्यांत पाणी... 🥀",
-      "काही नाती अशीही संपतात या आयुष्यात,\nना भांडण होतं, ना निरोप... फक्त एक जीवघेणी शांतता उरते. 💔",
-      "ज्या व्यक्तीसाठी आपण स्वतःला आणि जगाला विसरलो,\nत्याच व्यक्तीने एका क्षणात विचारलं, 'तू कोण आहेस?' 🥀",
-      "खूप जवळून पाहिले मी माणसांना बदलताना,\nज्यांनी आयुष्यभराची स्वप्ने दाखवली, त्यांनीच एका क्षणात रडायला सोडले... 💔",
-      "आपण कुणासाठी कितीही मेलो तरी शेवटी शून्यच,\nकारण किंमत भावनांना नसते, गरजेपुरतीच असते... 🥀",
-      "जखमा अशा नाही ज्या शरीरावर दिसतील,\nकाही वेदना अशा असतात ज्या फक्त डोळे बंद केल्यावर जाणवतात... 💔",
-      "हसणाऱ्या चेहऱ्यामागे किती दुःख लपलंय हे कोणालाच दिसत नाही,\nकारण जग फक्त हसणाऱ्यांचीच वाहव्वा करतं... 🥀",
-      "तुझ्या नंतर आयुष्य थांबले तर नाही,\nपण खरं सांगू, तुझ्याशिवाय जगायला मन अजिबात तयार नाही... 💔",
-      "खोट्या प्रेमाच्या बाजारात आपण खरं हृदय घेऊन गेलो,\nनुकसान तर होणारच होतं, आणि तेही कायमचं... 🥀",
-      "एका क्षणात परके झाले ते लोक,\nजे कालपर्यंत म्हणायचे 'तू फक्त माझा आहेस'... 💔",
-      "जीवनातले सर्वात कठीण काम काय ठाऊक आहे?\nडोळ्यांत आलेले अश्रू लपवून जगासमोर खोटं हसणे... 🥀"
-    ];
-
-    const comedyJokes = [
-      "मास्तर: सांग बंड्या, जगात सर्वात हुशार कोण?\nबंड्या: जो मास्तरच्या प्रश्नाचं उत्तर न देता बेंचखाली गप बसतो! 🤣",
-      "बायको: अहो, मी सुंदर दिसतेय का?\nनवरा: तू इतकी सुंदर आहेस की तुला पाहिल्यावर माझा चष्मा फुटला! 😆",
-      "पप्पू: डॉक्टर साहेब, मला झोपेत बोलायची वाईट सवय आहे.\nडॉक्टर: काही औषध लिहून देऊ का?\nपप्पू: नको डॉक्टर, फक्त बायकोच्या माहेरी जायची सोय करा! 😂",
-      "ग्राहक: दुकानदार साहेब, असा साबण द्या ज्याने माणूस गोरा होईल!\nदुकानदार: साबण नाही, पण आधार कार्ड एडिट करणारा ॲप नक्की देऊ शकतो! 🤣",
-      "मुलगा: पप्पा, मला सायकल हवीय!\nपप्पा: घरात बसून पुस्तक वाच, ज्ञानाने सर्व काही मिळते!\nमुलगा: मग पुस्तकावर बसून शाळेत जाऊ का? 😂",
-      "सासू: जावईबापू, आज जेवणात काय बनवू?\nजावई: काहीही बनवा, पण शेवटी बाहेरून मागवावं लागणार नाही एवढंच बघा! 😆",
-      "शिक्षक: सांग चिंटू, १ रुपयाचे १०० पैसे होतात, तर ५ रुपयांचे काय होईल?\nचिंटू: सर, थेट कुरकुरेचं पाकीट येईल! 🤣"
-    ];
-
-    let lastIdx = -1;
-    function generateContent() {
-      const outBox = document.getElementById('outputBox');
-      outBox.style.opacity = "0.3";
-
-      setTimeout(() => {
-        const pool = currentMode === 'shayari' ? deepShayaris : comedyJokes;
-        let r = Math.floor(Math.random() * pool.length);
-        while (r === lastIdx && pool.length > 1) {
-          r = Math.floor(Math.random() * pool.length);
-        }
-        lastIdx = r;
-        outBox.innerText = pool[r];
-        outBox.style.opacity = "1";
-      }, 150);
-    }
-
-    // Direct Event Bindings (100% Reliable & Non-Freezing)
-    document.getElementById('guestBtn').onclick = function() {
-      const gName = prompt("तुमचे नाव टाका:", "Guest_" + Math.floor(Math.random()*1000));
-      currentUser = (gName && gName.trim()) ? gName.trim() : ("Guest_" + Math.floor(Math.random()*1000));
-      document.getElementById('userDisplay').innerText = "👤 " + currentUser;
-      showScreen('portal-screen');
-    };
-
-    document.getElementById('authToggleText').onclick = function() {
-      isSignUpMode = !isSignUpMode;
-      document.getElementById('emailBtn').innerText = isSignUpMode ? "📝 नवीन खाते बनवा (Sign Up)" : "📧 Gmail ने लॉगिन करा";
-      document.getElementById('authToggleText').innerText = isSignUpMode ? "आधीच खाते आहे? लॉगिन करा" : "नवीन युजर आहात? येथे Sign Up करा";
-    };
-
-    document.getElementById('emailBtn').onclick = function() {
-      const email = document.getElementById('emailInput').value.trim();
-      const pass = document.getElementById('passInput').value.trim();
-
-      if (!email || !pass) return alert("कृपया ईमेल आणि पासवर्ड टाका!");
-      if (pass.length < 6) return alert("पासवर्ड किमान ६ अक्षरांचा असावा!");
-
-      if (!auth) {
-        alert("Firebase कनेक्ट नाही, Guest Login द्वारे आत जात आहे!");
-        currentUser = email.split('@')[0];
-        document.getElementById('userDisplay').innerText = "👤 " + currentUser;
-        return showScreen('portal-screen');
-      }
-
-      if (isSignUpMode) {
-        auth.createUserWithEmailAndPassword(email, pass)
-          .then(() => alert("खाते यशस्वीरीत्या तयार झाले!"))
-          .catch(err => alert("Sign Up त्रुटी: " + err.message));
+      if (input.type === "password") {
+        input.type = "text";
       } else {
-        auth.signInWithEmailAndPassword(email, pass)
-          .catch(err => alert("लॉगिन त्रुटी: " + err.message));
+        input.type = "password";
       }
-    };
+    }
 
-    document.getElementById('googleBtn').onclick = function() {
-      if (!auth) return alert("Firebase लोड होत आहे, कृपया Guest Login वापरा!");
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithRedirect(provider);
-    };
+    function unlockVault() {
 
-    document.getElementById('logoutBtn').onclick = function() {
-      if (auth) auth.signOut();
-      currentUser = "Guest";
-      showScreen('auth-screen');
-    };
+      const password =
+        document.getElementById("masterPassword").value;
 
-    // 3D Door Click Listeners
-    document.getElementById('doorShayari').onclick = function() {
-      triggerDoor(this, () => {
-        currentMode = "shayari";
-        document.getElementById('contentTitle').innerText = "💔 Sad Shayari";
-        document.getElementById('contentTitle').style.color = "#ff007f";
-        generateContent();
-        showScreen('content-screen');
-      });
-    };
+      if (!password) {
+        alert("Please enter your Master Password.");
+        return;
+      }
 
-    document.getElementById('doorJokes').onclick = function() {
-      triggerDoor(this, () => {
-        currentMode = "jokes";
-        document.getElementById('contentTitle').innerText = "😂 Funny Jokes";
-        document.getElementById('contentTitle').style.color = "#f5af19";
-        generateContent();
-        showScreen('content-screen');
-      });
-    };
+      /*
+        IMPORTANT:
+        This is only a UI demonstration.
 
-    document.getElementById('doorLive').onclick = function() {
-      triggerDoor(this, () => {
-        openChatRoom('global_chat', '🌐 Global Live Chat');
-      });
-    };
+        Real Master Password verification,
+        key derivation and vault encryption
+        will be implemented separately.
+      */
 
-    document.getElementById('doorPrivate').onclick = function() {
-      triggerDoor(this, () => {
-        const gName = prompt("🔐 प्रायव्हेट ग्रुपचे नाव टाका:");
-        if (!gName || !gName.trim()) return;
-        const gPass = prompt("🔑 ग्रुपचा पासवर्ड टाका:");
-        if (!gPass || !gPass.trim()) return;
+      document.getElementById("lockScreen").style.display = "none";
+      document.getElementById("vaultScreen").style.display = "block";
+    }
 
-        const roomId = "priv_" + gName.trim().toLowerCase() + "_" + gPass.trim();
-        openChatRoom(roomId, "🔒 रूम: " + gName.trim());
-      });
-    };
+    function lockVault() {
 
-    document.getElementById('doorNews').onclick = function() {
-      triggerDoor(this, () => {
-        alert("📰 Cyber Tech News दालन लवकरच सुरू होत आहे!");
-      });
-    };
+      document.getElementById("vaultScreen").style.display = "none";
+      document.getElementById("lockScreen").style.display = "flex";
 
-    document.getElementById('doorSecret').onclick =
+      document.getElementById("masterPassword").value = "";
+    }
+
+    function biometricMessage() {
+      alert("Biometric unlock will be added in the secure app version.");
+    }
+
+    function addPassword() {
+      alert("Add Password screen will be added next.");
+    }
+
+  </script>
+
+</body>
+</html>
