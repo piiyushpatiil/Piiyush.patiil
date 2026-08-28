@@ -2,8 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0b1110">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="theme-color"
+    content="#22c55e"
+  >
+
+  <link
+    rel="manifest"
+    href="manifest.json"
+  >
+
   <title>MyVault - Personal Password Manager</title>
 
   <style>
@@ -16,12 +30,22 @@
     body {
       font-family: Arial, sans-serif;
       background: #07100f;
-      color: #ffffff;
+      color: white;
       min-height: 100vh;
     }
 
-    .app {
+    button,
+    input {
+      font-family: inherit;
+    }
+
+    .screen {
       min-height: 100vh;
+    }
+
+    /* LOGIN SCREEN */
+
+    #lockScreen {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -30,17 +54,17 @@
 
     .card {
       width: 100%;
-      max-width: 420px;
+      max-width: 430px;
       background: #101b19;
-      border: 1px solid #243a35;
+      border: 1px solid #29413b;
       border-radius: 24px;
       padding: 32px 24px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .45);
     }
 
     .logo {
-      width: 72px;
-      height: 72px;
+      width: 76px;
+      height: 76px;
       margin: 0 auto 20px;
       border-radius: 22px;
       background: #22c55e;
@@ -59,26 +83,27 @@
     .subtitle {
       text-align: center;
       color: #9aada8;
-      margin-bottom: 30px;
       line-height: 1.5;
+      margin-bottom: 25px;
     }
 
-    .security {
+    .security-box {
       background: #0b1513;
-      border: 1px solid #243a35;
+      border: 1px solid #29413b;
       border-radius: 14px;
       padding: 14px;
-      margin-bottom: 24px;
+      margin-bottom: 25px;
+      text-align: center;
       color: #b8c8c4;
       font-size: 13px;
-      text-align: center;
+      line-height: 1.5;
     }
 
     label {
       display: block;
-      margin-bottom: 8px;
       color: #dce8e5;
       font-size: 14px;
+      margin-bottom: 8px;
     }
 
     .password-box {
@@ -88,9 +113,8 @@
     input {
       width: 100%;
       padding: 15px;
-      padding-right: 50px;
-      border-radius: 12px;
       border: 1px solid #304943;
+      border-radius: 12px;
       background: #0b1513;
       color: white;
       outline: none;
@@ -101,23 +125,28 @@
       border-color: #22c55e;
     }
 
+    .password-box input {
+      padding-right: 50px;
+    }
+
     .show-btn {
       position: absolute;
-      right: 12px;
-      top: 12px;
+      right: 10px;
+      top: 9px;
       background: none;
       border: none;
-      color: #8da39d;
-      font-size: 18px;
+      color: #9aada8;
+      font-size: 19px;
+      padding: 8px;
       cursor: pointer;
     }
 
-    .btn {
+    .primary-btn {
       width: 100%;
+      margin-top: 18px;
+      padding: 15px;
       border: none;
       border-radius: 12px;
-      padding: 15px;
-      margin-top: 18px;
       background: #22c55e;
       color: #041009;
       font-size: 16px;
@@ -125,48 +154,43 @@
       cursor: pointer;
     }
 
-    .btn:active {
-      transform: scale(0.98);
-    }
-
-    .fingerprint {
+    .secondary-btn {
       width: 100%;
       margin-top: 12px;
-      padding: 13px;
-      background: transparent;
+      padding: 14px;
       border: 1px solid #304943;
       border-radius: 12px;
-      color: #dce8e5;
-      cursor: pointer;
+      background: transparent;
+      color: white;
       font-size: 14px;
+      cursor: pointer;
     }
 
     .footer {
       text-align: center;
-      margin-top: 25px;
       color: #71857f;
       font-size: 12px;
+      margin-top: 24px;
     }
 
-    /* Vault screen */
+    /* VAULT */
 
     #vaultScreen {
       display: none;
-      width: 100%;
-      min-height: 100vh;
       padding: 20px;
     }
 
     .vault-container {
+      width: 100%;
       max-width: 900px;
       margin: auto;
     }
 
     .topbar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 25px;
+      justify-content: space-between;
+      margin-bottom: 10px;
     }
 
     .brand {
@@ -175,20 +199,20 @@
     }
 
     .lock-btn {
-      background: #172521;
       border: 1px solid #304943;
+      background: #172521;
       color: white;
-      padding: 10px 14px;
       border-radius: 10px;
+      padding: 10px 14px;
       cursor: pointer;
     }
 
     .welcome {
-      color: #8fa49e;
+      color: #899e98;
       margin-bottom: 20px;
     }
 
-    .search {
+    .search-box {
       margin-bottom: 20px;
     }
 
@@ -200,8 +224,8 @@
     .item {
       background: #101b19;
       border: 1px solid #243a35;
-      padding: 18px;
       border-radius: 16px;
+      padding: 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -217,6 +241,10 @@
       font-size: 13px;
     }
 
+    .favorite {
+      font-size: 20px;
+    }
+
     .add-btn {
       position: fixed;
       right: 22px;
@@ -227,29 +255,48 @@
       border-radius: 50%;
       background: #22c55e;
       color: #041009;
-      font-size: 28px;
+      font-size: 30px;
       cursor: pointer;
+    }
+
+    @media (max-width: 500px) {
+      .card {
+        padding: 28px 20px;
+      }
+
+      .brand {
+        font-size: 21px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- LOCK SCREEN -->
-  <main class="app" id="lockScreen">
+  <!-- LOGIN / LOCK SCREEN -->
+
+  <main
+    id="lockScreen"
+    class="screen"
+  >
 
     <section class="card">
 
-      <div class="logo">🔐</div>
+      <div class="logo">
+        🔐
+      </div>
 
-      <h1>MyVault</h1>
+      <h1>
+        MyVault
+      </h1>
 
       <p class="subtitle">
         Your personal password manager
       </p>
 
-      <div class="security">
-        🛡️ Your vault will be protected with strong encryption.
+      <div class="security-box">
+        🛡️ Your vault is designed to use
+        strong encryption.
       </div>
 
       <label for="masterPassword">
@@ -261,30 +308,38 @@
         <input
           id="masterPassword"
           type="password"
-          placeholder="Enter your master password"
+          placeholder="Enter Master Password"
           autocomplete="off"
         >
 
         <button
           class="show-btn"
           onclick="togglePassword()"
-          aria-label="Show password"
+          type="button"
         >
           👁
         </button>
 
       </div>
 
-      <button class="btn" onclick="unlockVault()">
+      <button
+        class="primary-btn"
+        onclick="unlockVault()"
+        type="button"
+      >
         🔓 Unlock Vault
       </button>
 
-      <button class="fingerprint" onclick="biometricMessage()">
+      <button
+        class="secondary-btn"
+        onclick="biometricMessage()"
+        type="button"
+      >
         👆 Use Fingerprint
       </button>
 
       <p class="footer">
-        MyVault • Personal & Private
+        MyVault • Private & Secure
       </p>
 
     </section>
@@ -293,7 +348,11 @@
 
 
   <!-- VAULT SCREEN -->
-  <section id="vaultScreen">
+
+  <section
+    id="vaultScreen"
+    class="screen"
+  >
 
     <div class="vault-container">
 
@@ -303,7 +362,11 @@
           🔐 MyVault
         </div>
 
-        <button class="lock-btn" onclick="lockVault()">
+        <button
+          class="lock-btn"
+          onclick="lockVault()"
+          type="button"
+        >
           🔒 Lock
         </button>
 
@@ -313,55 +376,103 @@
         Your encrypted password vault
       </p>
 
-      <div class="search">
+      <div class="search-box">
+
         <input
+          id="searchInput"
           type="search"
           placeholder="🔍 Search passwords..."
-          id="searchInput"
+          oninput="searchVault()"
         >
+
       </div>
 
-      <div class="items">
+      <div
+        id="passwordItems"
+        class="items"
+      >
 
         <div class="item">
+
           <div>
-            <div class="item-name">Google</div>
-            <div class="item-user">example@gmail.com</div>
+            <div class="item-name">
+              Google
+            </div>
+
+            <div class="item-user">
+              example@gmail.com
+            </div>
           </div>
-          <div>⭐</div>
+
+          <div class="favorite">
+            ⭐
+          </div>
+
         </div>
 
-        <div class="item">
-          <div>
-            <div class="item-name">Instagram</div>
-            <div class="item-user">Your Instagram account</div>
-          </div>
-          <div>⭐</div>
-        </div>
 
         <div class="item">
+
           <div>
-            <div class="item-name">Facebook</div>
-            <div class="item-user">Your Facebook account</div>
+            <div class="item-name">
+              Instagram
+            </div>
+
+            <div class="item-user">
+              Instagram Account
+            </div>
           </div>
-          <div>☆</div>
+
+          <div class="favorite">
+            ⭐
+          </div>
+
+        </div>
+
+
+        <div class="item">
+
+          <div>
+            <div class="item-name">
+              Facebook
+            </div>
+
+            <div class="item-user">
+              Facebook Account
+            </div>
+          </div>
+
+          <div class="favorite">
+            ☆
+          </div>
+
         </div>
 
       </div>
 
     </div>
 
-    <button class="add-btn" onclick="addPassword()">
+    <button
+      class="add-btn"
+      onclick="addPassword()"
+      type="button"
+    >
       +
     </button>
 
   </section>
 
 
+  <!-- JAVASCRIPT -->
+
   <script>
 
+    let vaultUnlocked = false;
+
     function togglePassword() {
-      const input = document.getElementById("masterPassword");
+
+      const input =
+        document.getElementById("masterPassword");
 
       if (input.type === "password") {
         input.type = "text";
@@ -370,43 +481,97 @@
       }
     }
 
+
     function unlockVault() {
 
       const password =
         document.getElementById("masterPassword").value;
 
       if (!password) {
-        alert("Please enter your Master Password.");
+
+        alert(
+          "Please enter your Master Password."
+        );
+
         return;
       }
 
       /*
-        IMPORTANT:
-        This is only a UI demonstration.
+        TEMPORARY UI ONLY.
 
-        Real Master Password verification,
-        key derivation and vault encryption
-        will be implemented separately.
+        Real Master Password verification
+        and encrypted vault unlocking will
+        be connected to crypto.js next.
       */
 
-      document.getElementById("lockScreen").style.display = "none";
-      document.getElementById("vaultScreen").style.display = "block";
+      vaultUnlocked = true;
+
+      document.getElementById(
+        "lockScreen"
+      ).style.display = "none";
+
+      document.getElementById(
+        "vaultScreen"
+      ).style.display = "block";
     }
+
 
     function lockVault() {
 
-      document.getElementById("vaultScreen").style.display = "none";
-      document.getElementById("lockScreen").style.display = "flex";
+      vaultUnlocked = false;
 
-      document.getElementById("masterPassword").value = "";
+      document.getElementById(
+        "vaultScreen"
+      ).style.display = "none";
+
+      document.getElementById(
+        "lockScreen"
+      ).style.display = "flex";
+
+      document.getElementById(
+        "masterPassword"
+      ).value = "";
     }
+
 
     function biometricMessage() {
-      alert("Biometric unlock will be added in the secure app version.");
+
+      alert(
+        "Biometric unlock will be connected in the mobile app version."
+      );
     }
 
+
     function addPassword() {
-      alert("Add Password screen will be added next.");
+
+      alert(
+        "Secure Add Password screen will be added next."
+      );
+    }
+
+
+    function searchVault() {
+
+      const query =
+        document.getElementById(
+          "searchInput"
+        ).value.toLowerCase();
+
+      const items =
+        document.querySelectorAll(".item");
+
+      items.forEach(function(item) {
+
+        const text =
+          item.innerText.toLowerCase();
+
+        if (text.includes(query)) {
+          item.style.display = "flex";
+        } else {
+          item.style.display = "none";
+        }
+
+      });
     }
 
   </script>
